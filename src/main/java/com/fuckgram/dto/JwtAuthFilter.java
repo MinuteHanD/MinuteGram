@@ -16,6 +16,7 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtService jwtService;
 
@@ -32,14 +33,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             try {
                 String email = jwtService.validateTokenAndGetEmail(token);
-                User user = userRepository.findByEmail(email).orElseThrow();
+                User user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found: " + email));
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         user, null, user.getAuthorities()
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
+                //debugging
+                System.out.println("Successfully authenticated user: " + email);
+
             } catch (Exception e) {
-                // Token invalid - don't set authentication
+                //debugging
+                System.err.println("Authentication error: " + e.getMessage());
             }
         }
 
