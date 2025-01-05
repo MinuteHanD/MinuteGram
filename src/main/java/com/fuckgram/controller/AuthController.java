@@ -5,6 +5,7 @@ package com.fuckgram.controller;
 import com.fuckgram.dto.JwtService;
 import com.fuckgram.dto.LoginRequest;
 import com.fuckgram.dto.LoginResponse;
+import com.fuckgram.entity.Role;
 import com.fuckgram.entity.User;
 import com.fuckgram.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,7 +41,14 @@ public class AuthController {
     public ResponseEntity<?> signup(@RequestBody User user) {
         System.out.println("Signup attempt for: " + user.getEmail());  // Debug log
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("USER"));
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.USER);
+
+        if (userRepository.count() == 0){
+            roles.add(Role.ADMIN);
+        }
+
+        user.setRoles(roles);
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok("User registered: " + user.getEmail());
     }

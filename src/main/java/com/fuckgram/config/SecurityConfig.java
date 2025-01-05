@@ -41,6 +41,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
 
+                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+
                     auth.requestMatchers("/api/posts/**").authenticated();
                     auth.requestMatchers("/api/users/**").authenticated();
                     auth.anyRequest().authenticated();
