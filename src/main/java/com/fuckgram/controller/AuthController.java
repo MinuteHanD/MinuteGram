@@ -8,6 +8,7 @@ import com.fuckgram.dto.LoginResponse;
 import com.fuckgram.entity.Role;
 import com.fuckgram.entity.User;
 import com.fuckgram.repository.UserRepository;
+import com.fuckgram.service.TokenManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +33,9 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private TokenManagementService tokenManagementService;
+
+
 
     @Autowired
     private JwtService jwtService;
@@ -72,6 +75,15 @@ public class AuthController {
                 "token", token,
                 "email", user.getEmail()
         ));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader){
+        if (authHeader != null && authHeader.startsWith("Bearer ")){
+            String token = authHeader.substring(7);
+            tokenManagementService.invalidateToken(token);
+        }
+        return ResponseEntity.ok("Logged out successfully");
     }
 
     @GetMapping("/test")
