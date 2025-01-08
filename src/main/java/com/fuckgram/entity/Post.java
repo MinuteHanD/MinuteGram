@@ -20,6 +20,11 @@ public class Post {
     @JsonBackReference
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "topic_id", nullable = false)
+    private Topic topic;
+
+
     public Post(){
         this.createdAt = LocalDateTime.now();
     }
@@ -54,6 +59,14 @@ public class Post {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
     }
 
 }
