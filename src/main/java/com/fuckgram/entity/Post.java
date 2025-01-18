@@ -12,6 +12,9 @@ public class Post {
     private Long id;
 
     @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
     private String content;
     private LocalDateTime createdAt;
 
@@ -20,11 +23,18 @@ public class Post {
     @JsonBackReference
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
 
+    public String getTitle(){
+        return title;
+    }
+
+    public void setTitle(String title){
+        this.title = title;
+    }
     public Post(){
         this.createdAt = LocalDateTime.now();
     }

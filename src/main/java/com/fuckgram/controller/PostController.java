@@ -1,5 +1,6 @@
 package com.fuckgram.controller;
 
+import com.fuckgram.dto.PostCreateDto;
 import com.fuckgram.entity.Post;
 import com.fuckgram.entity.User;
 import com.fuckgram.repository.PostRepository;
@@ -22,8 +23,8 @@ public class PostController {
 
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody Post post, @AuthenticationPrincipal UserDetails userDetails) {
-        Post savedPost = postService.createPost(post, userDetails.getUsername());
+    public ResponseEntity<Post> createPost(@RequestBody PostCreateDto postDto, @AuthenticationPrincipal UserDetails userDetails) {
+        Post savedPost = postService.createPost(postDto, userDetails.getUsername());
         return ResponseEntity.ok(savedPost);
     }
 

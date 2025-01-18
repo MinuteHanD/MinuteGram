@@ -50,6 +50,20 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Post> posts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "creator")
+    private List<Topic> createdTopics = new ArrayList<>();
+
+
+    public List<Topic> getCreatedTopics(){
+        return createdTopics;
+    }
+
+    public void SetCreatedTopics(List<Topic> createdTopics) {
+        this.createdTopics = createdTopics;
+    }
+
+
+
     public User() {
 
     }

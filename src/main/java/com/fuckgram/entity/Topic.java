@@ -3,6 +3,7 @@ package com.fuckgram.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,8 +21,12 @@ public class Topic {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id", nullable = false)
+    private User creator;
+
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     public Topic(){
         this.createdAt = LocalDateTime.now();
@@ -65,6 +70,14 @@ public class Topic {
 
     public void setPosts(List<Post> posts) {
         this.posts = posts;
+    }
+
+    public User getCreator(){
+        return creator;
+    }
+
+    public void setCreator(User creator){
+        this.creator = creator;
     }
 
 
