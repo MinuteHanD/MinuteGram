@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import com.fuckgram.entity.User;
 
 import java.awt.desktop.UserSessionEvent;
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
+
+
 import java.time.LocalDateTime;
 
 @Service
@@ -61,7 +63,7 @@ public class TopicService {
     public Page<Post> getTopicPosts(String topicName, Pageable pageable) {
         Topic topic = topicRepository.findByName(topicName)
                 .orElseThrow(() -> new RuntimeException("Topic not found: " + topicName));
-        return postRepository.findAllByTopic(topic, (SpringDataWebProperties.Pageable) pageable);
+        return postRepository.findAllByTopic(topic, pageable);
     }
 
 }

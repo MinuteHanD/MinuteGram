@@ -35,7 +35,7 @@ public class TopicController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Topic> topics = topicService.getAllTopics((java.awt.print.Pageable) pageable);
+        Page<Topic> topics = topicService.getAllTopics(pageable);
         return ResponseEntity.ok(topics.map(TopicDto::from));
     }
 
@@ -45,7 +45,7 @@ public class TopicController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> posts = topicService.getTopicPosts(name, (java.awt.print.Pageable) pageable);
+        Page<Post> posts = topicService.getTopicPosts(name, pageable);
         return ResponseEntity.ok(posts.map(PostDto::from));
     }
 }
