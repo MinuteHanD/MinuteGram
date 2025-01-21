@@ -26,8 +26,8 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostCreateDto postDto, @AuthenticationPrincipal UserDetails userDetails) {
-        Post savedPost = postService.createPost(postDto, postDto.getTopicName());
-        return ResponseEntity.ok(PostResponseDto.fromEntity(savedPost));
+        PostResponseDto responseDto = postService.createPost(postDto);
+        return ResponseEntity.ok(responseDto);
     }
 
 
