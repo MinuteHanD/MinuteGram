@@ -1,6 +1,7 @@
 package com.fuckgram.controller;
 
 import com.fuckgram.dto.PostCreateDto;
+import com.fuckgram.dto.PostResponseDto;
 import com.fuckgram.entity.Post;
 import com.fuckgram.entity.User;
 import com.fuckgram.repository.PostRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -23,14 +25,16 @@ public class PostController {
 
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostCreateDto postDto, @AuthenticationPrincipal UserDetails userDetails) {
-        Post savedPost = postService.createPost(postDto, userDetails.getUsername());
-        return ResponseEntity.ok(savedPost);
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostCreateDto postDto, @AuthenticationPrincipal UserDetails userDetails) {
+        Post savedPost = postService.createPost(postDto, postDto.getTopicName());
+        return ResponseEntity.ok(PostResponseDto.fromEntity(savedPost));
     }
 
 
     @GetMapping
-    public List<Post> getAllPosts() {
-        return postService.getAllPosts();
+    public List<PostResponseDto> getAllPosts() {
+        return postService.getAllPosts().stream()
+                .map(PostResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

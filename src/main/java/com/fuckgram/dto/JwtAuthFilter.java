@@ -33,10 +33,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
+        System.out.println("Auth header received: " + authHeader);
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
+            System.out.println("Extracted token: " + token);
+
             if (tokenManagementService.isTokenBlacklisted(token)){
+                System.out.println("Token is blacklisted!");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
