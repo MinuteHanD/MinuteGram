@@ -42,11 +42,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
 
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
 
                     auth.requestMatchers("/api/posts/**").authenticated();
                     auth.requestMatchers("/api/users/**").authenticated();
+                    auth.requestMatchers("/api/comments/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

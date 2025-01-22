@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Post {
@@ -29,6 +31,10 @@ public class Post {
     @JoinColumn(name = "topic_id", nullable = false)
     @JsonIgnore
     private Topic topic;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
 
 
     public String getTitle(){
@@ -80,6 +86,14 @@ public class Post {
 
     public void setTopic(Topic topic) {
         this.topic = topic;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
 }
