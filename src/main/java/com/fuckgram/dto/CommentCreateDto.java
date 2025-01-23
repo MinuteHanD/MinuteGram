@@ -1,8 +1,15 @@
 package com.fuckgram.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class CommentCreateDto {
+
+    @NotBlank(message = "Content cannot be blank")
     private String content;
+    @NotNull(message = "Post ID cannot be null")
     private Long postId;
+
     private Long parentCommentId;
 
     public String getContent() {
