@@ -1,6 +1,7 @@
 package com.fuckgram.controller;
 
 import com.fuckgram.dto.PostDto;
+import com.fuckgram.dto.PostResponseDto;
 import com.fuckgram.dto.TopicCreateDto;
 import com.fuckgram.dto.TopicDto;
 import com.fuckgram.entity.Post;
@@ -39,13 +40,14 @@ public class TopicController {
         return ResponseEntity.ok(topics.map(TopicDto::from));
     }
 
-    @GetMapping("/{name}/posts")
-    public ResponseEntity<Page<PostDto>> getTopicPosts(
-            @PathVariable String name,
+    @GetMapping("/{id}/posts")
+    public ResponseEntity<Page<PostResponseDto>> getTopicPosts(
+            @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> posts = topicService.getTopicPosts(name, pageable);
-        return ResponseEntity.ok(posts.map(PostDto::from));
+        Topic topic = topicService.getTopicById(id);
+        Page<Post> posts = topicService.getTopicPosts(topic.getName(), pageable);
+        return ResponseEntity.ok(posts.map(PostResponseDto::fromEntity));
     }
 }

@@ -38,4 +38,11 @@ public class PostController {
                 .map(PostResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long postId) {
+        Post post = postService.getPostById(postId);
+        return ResponseEntity.ok(PostResponseDto.fromEntity(post));
+    }
+
 }

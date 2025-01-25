@@ -66,4 +66,8 @@ public class TopicService {
         return postRepository.findAllByTopic(topic, pageable);
     }
 
+    public Topic getTopicById(Long id) {
+        return topicRepository.findById(id)
+                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + id));
+    }
 }
