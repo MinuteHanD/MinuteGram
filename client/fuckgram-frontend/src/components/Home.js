@@ -1,0 +1,77 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+
+const Home = () => {
+  const [topics, setTopics] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [newTopicName, setNewTopicName] = useState('');
+  const [newTopicDescription, setNewTopicDescription] = useState('');
+  const navigate = useNavigate();
+
+  const fetchTopics = async () => {
+    try {
+      const response = await api.get('/topics'); // Fetch topics
+      setTopics(response.data.content); // Assuming pagination
+    } catch (err) {
+      console.error(err);
+      alert('Failed to fetch topics');
+    }
+  };
+
+  const createTopic = async () => {
+    try {
+      await api.post('/topics', { name: newTopicName, description: newTopicDescription });
+      alert('Topic created successfully!');
+      setShowForm(false);
+      fetchTopics(); // Refresh topics
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create topic');
+    }
+  };
+
+  useEffect(() => {
+    fetchTopics();
+  }, []);
+
+  return (
+    <div>
+      <header>
+        <button onClick={() => navigate('/login')}>Login</button>
+        <button onClick={() => navigate('/signup')}>Signup</button>
+      </header>
+      <h2>Topics</h2>
+      <ul>
+        {topics.map((topic) => (
+          <li key={topic.id}>
+            <button onClick={() => navigate(`/topics/${topic.id}`)}>
+              {topic.name}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <button onClick={() => setShowForm(!showForm)}>Create New Topic</button>
+      {showForm && (
+        <div>
+          <h3>Create a New Topic</h3>
+          <input
+            type="text"
+            placeholder="Topic Name"
+            value={newTopicName}
+            onChange={(e) => setNewTopicName(e.target.value)}
+          />
+          <textarea
+            placeholder="Description"
+            value={newTopicDescription}
+            onChange={(e) => setNewTopicDescription(e.target.value)}
+          />
+          <button onClick={createTopic}>Submit</button>
+          <button onClick={() => setShowForm(false)}>Cancel</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Home;

@@ -3,6 +3,7 @@ package com.fuckgram.dto;
 import com.fuckgram.entity.Comment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class CommentResponseDto {
     private Long id;
@@ -10,6 +11,7 @@ public class CommentResponseDto {
     private String authorName;
     private LocalDateTime createdAt;
     private Long parentCommentId;
+    private List<CommentResponseDto> replies;
 
 
     public static CommentResponseDto fromEntity(Comment comment) {
@@ -24,6 +26,14 @@ public class CommentResponseDto {
         }
 
         return dto;
+    }
+
+    public List<CommentResponseDto> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<CommentResponseDto> replies) {
+        this.replies = replies;
     }
 
     public Long getId() {

@@ -48,12 +48,36 @@ public class CommentService {
         return CommentResponseDto.fromEntity(savedComment);
     }
 
-    public List<CommentResponseDto> getPostComments(Long postId){
-        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId)
+    public List<CommentResponseDto> getPostComments(Long postId) {
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
+
+        // Map top-level comments to DTOs
+        List<CommentResponseDto> commentDtos = comments.stream()
+                .filter(comment -> comment.getParentComment() == null) // Top-level comments
+                .map(comment -> {
+                    CommentResponseDto dto = CommentResponseDto.fromEntity(comment);
+
+                    // Fetch and attach replies
+                    List<CommentResponseDto> replies = commentRepository.findByParentCommentIdOrderByCreatedAt(comment.getId())
+                            .stream()
+                            .map(CommentResponseDto::fromEntity)
+                            .collect(Collectors.toList());
+                    dto.setReplies(replies); // Add replies to the DTO
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return commentDtos;
+    }
+
+
+    public List<CommentResponseDto> getCommentReplies(Long parentCommentId) {
+        return commentRepository.findByParentCommentIdOrderByCreatedAt(parentCommentId)
                 .stream()
                 .map(CommentResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
 
 
 }

@@ -31,4 +31,11 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
+    @GetMapping("/{commentId}/replies")
+    public ResponseEntity<List<CommentResponseDto>> getCommentReplies(@PathVariable Long commentId) {
+        List<CommentResponseDto> replies = commentService.getCommentReplies(commentId);
+        return ResponseEntity.ok(replies);
+    }
+
+
 }

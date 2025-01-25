@@ -50,4 +50,11 @@ public class TopicController {
         Page<Post> posts = topicService.getTopicPosts(topic.getName(), pageable);
         return ResponseEntity.ok(posts.map(PostResponseDto::fromEntity));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TopicDto> getTopicById(@PathVariable Long id) {
+        Topic topic = topicService.getTopicById(id);
+        return ResponseEntity.ok(TopicDto.from(topic));
+    }
+
 }
