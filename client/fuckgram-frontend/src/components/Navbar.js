@@ -3,13 +3,28 @@ import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token'); // Check if user is logged in
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    alert('You have been logged out.');
+    navigate('/login');
+  };
 
   return (
     <nav style={styles.navbar}>
       <button style={styles.button} onClick={() => navigate('/')}>
         Home
       </button>
-      {/* Add more buttons here as needed */}
+      {token ? (
+        <button style={styles.button} onClick={handleLogout}>
+          Logout
+        </button>
+      ) : (
+        <button style={styles.button} onClick={() => navigate('/login')}>
+          Login
+        </button>
+      )}
     </nav>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const PostDetails = () => {
@@ -10,7 +10,9 @@ const PostDetails = () => {
   const [newComment, setNewComment] = useState('');
   const [showReplyForm, setShowReplyForm] = useState({}); // Tracks which comment's reply form to show
   const [replyContent, setReplyContent] = useState('');
-  const [replies, setReplies] = useState({}); // Stores replies for each comment
+  const [replies, setReplies] = useState({});
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token'); 
 
   const fetchPostDetails = async () => {
     try {
@@ -77,7 +79,12 @@ const PostDetails = () => {
           <li key={comment.id}>
             {comment.content} - <small>by {comment.authorName}</small>
             <button onClick={() => fetchReplies(comment.id)}>View Replies</button>
+            {token ? (
             <button onClick={() => setShowReplyForm({ [comment.id]: true })}>Reply</button>
+          ) : (
+            <button onClick={() => navigate('/login')}>Login to Reply</button>
+          )}
+            
             {/* Replies */}
             {replies[comment.id] && (
               <ul>
@@ -104,7 +111,12 @@ const PostDetails = () => {
         ))}
       </ul>
       {/* Create New Comment */}
-      <button onClick={() => setShowCommentForm(!showCommentForm)}>Add Comment</button>
+      {token ? (
+        <button onClick={() => setShowCommentForm(!showCommentForm)}>Add Comment</button>
+      ) : (
+        <button onClick={() => navigate('/login')}>Login to Add Comment</button>
+      )}
+      
       {showCommentForm && (
         <div>
           <textarea

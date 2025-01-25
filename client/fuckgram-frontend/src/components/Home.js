@@ -8,23 +8,26 @@ const Home = () => {
   const [newTopicName, setNewTopicName] = useState('');
   const [newTopicDescription, setNewTopicDescription] = useState('');
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const fetchTopics = async () => {
     try {
-      const response = await api.get('/topics'); // Fetch topics
-      setTopics(response.data.content); // Assuming pagination
+      const response = await api.get('/topics'); 
+      setTopics(response.data.content);
     } catch (err) {
       console.error(err);
       alert('Failed to fetch topics');
     }
   };
 
+  
+
   const createTopic = async () => {
     try {
       await api.post('/topics', { name: newTopicName, description: newTopicDescription });
       alert('Topic created successfully!');
       setShowForm(false);
-      fetchTopics(); // Refresh topics
+      fetchTopics(); 
     } catch (err) {
       console.error(err);
       alert('Failed to create topic');
@@ -51,7 +54,12 @@ const Home = () => {
           </li>
         ))}
       </ul>
-      <button onClick={() => setShowForm(!showForm)}>Create New Topic</button>
+      {token ? (
+        <button onClick={() => setShowForm(!showForm)}>Create New Topic</button>
+      ) : (
+        <button onClick={() => navigate('/login')}>Login to Create Topic</button>
+      )}
+      
       {showForm && (
         <div>
           <h3>Create a New Topic</h3>

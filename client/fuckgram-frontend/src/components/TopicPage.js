@@ -10,6 +10,7 @@ const TopicPage = () => {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const fetchPosts = async () => {
     try {
@@ -56,7 +57,12 @@ const TopicPage = () => {
           </li>
         ))}
       </ul>
-      <button onClick={() => setShowForm(!showForm)}>Create New Post</button>
+      {token ? (
+        <button onClick={() => setShowForm(!showForm)}>Create New Post</button>
+      ) : (
+        <button onClick={() => navigate('/login')}>Login to Create Post</button>
+      )}
+      
       {showForm && (
         <div>
           <h3>Create a New Post</h3>
