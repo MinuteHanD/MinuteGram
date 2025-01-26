@@ -18,7 +18,7 @@ public class DemoApplication {
 		String dbUsername = System.getenv("DB_USERNAME");
 		String dbPassword = System.getenv("DB_PASSWORD");
 		String jwtSecret = System.getenv("JWT_SECRET");
-		String serverPort = System.getenv("SERVER_PORT");
+		//String serverPort = System.getenv("SERVER_PORT");
 		String jwtExpiration = System.getenv("JWT_EXPIRATION");
 
 		// Set system properties
@@ -26,7 +26,7 @@ public class DemoApplication {
 		System.setProperty("spring.datasource.username", dbUsername);
 		System.setProperty("spring.datasource.password", dbPassword);
 		System.setProperty("jwt.secret", jwtSecret);
-		System.setProperty("server.port", serverPort);
+		//System.setProperty("server.port", serverPort);
 		System.setProperty("jwt.expiration", jwtExpiration);
 
 	}
