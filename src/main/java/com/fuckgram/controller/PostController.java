@@ -7,6 +7,7 @@ import com.fuckgram.entity.User;
 import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.UserRepository;
 import com.fuckgram.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class PostController {
 
 
     @PostMapping
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostCreateDto postDto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostCreateDto postDto, @AuthenticationPrincipal UserDetails userDetails) {
         PostResponseDto responseDto = postService.createPost(postDto);
         return ResponseEntity.ok(responseDto);
     }
@@ -37,4 +38,11 @@ public class PostController {
                 .map(PostResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long postId) {
+        Post post = postService.getPostById(postId);
+        return ResponseEntity.ok(PostResponseDto.fromEntity(post));
+    }
+
 }
