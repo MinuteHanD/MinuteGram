@@ -1,8 +1,7 @@
 # Stage 1: Build the JAR file
 FROM eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /app
-COPY . .
-RUN ./mvnw clean package
+
 
 # Stage 2: Run the application
 FROM eclipse-temurin:17-jdk-alpine
