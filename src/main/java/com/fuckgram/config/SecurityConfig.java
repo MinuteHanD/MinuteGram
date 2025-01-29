@@ -65,7 +65,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React frontend origin
+        configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app")); // React frontend origin
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allowed headers
         configuration.setAllowCredentials(true); // Allow credentials (cookies, auth headers)
