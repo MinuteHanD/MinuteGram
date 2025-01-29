@@ -38,6 +38,30 @@ const Home = () => {
     fetchTopics();
   }, []);
 
+
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const response = await api.get('/topics');
+        console.log('Connection successful:', response.data);
+      } catch (error) {
+        console.error('Connection error:', error);
+        
+        // Additional error details for debugging
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+          console.error('Error status:', error.response.status);
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Error setting up request:', error.message);
+        }
+      }
+    };
+
+    testConnection();
+  }, []);
+
   return (
     <div>
       <header>
