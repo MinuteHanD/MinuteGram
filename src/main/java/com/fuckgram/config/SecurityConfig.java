@@ -41,8 +41,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
@@ -65,10 +65,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app")); // React frontend origin
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allowed headers
-        configuration.setAllowCredentials(true); // Allow credentials (cookies, auth headers)
+        configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
