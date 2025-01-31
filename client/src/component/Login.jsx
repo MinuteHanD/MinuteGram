@@ -1,0 +1,100 @@
+import React, { useState } from 'react';
+import api from '../service/apiClient';
+import { useNavigate } from 'react-router-dom';
+import { LogIn } from 'lucide-react';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate(); 
+
+  const handleLogin = async () => {
+    try {
+      console.log('Attempting login with:', { email });
+      
+      const response = await api.post('/auth/login', { email, password });
+      console.log('Login response:', response.data);
+      
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        console.log('Token stored:', response.data.token);
+        
+        navigate('/');
+      } else {
+        console.error('No token received in response');
+        alert('Login failed: No token received');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      
+      if (err.response) {
+        console.error('Error response:', err.response.data);
+        console.error('Error status:', err.response.status);
+        alert(`Login failed: ${err.response.data.message || 'Unknown error'}`);
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+        alert('Login failed: No response from server');
+      } else {
+        console.error('Error setting up request:', err.message);
+        alert(`Login failed: ${err.message}`);
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-dark-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-dark-100 p-8 rounded-xl shadow-2xl">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-bold text-dark-400">
+            Welcome Back
+          </h2>
+          <p className="mt-2 text-sm text-dark-300">
+            Sign in to continue to your dashboard
+          </p>
+        </div>
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="dark-input w-full"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="dark-input w-full"
+              required
+            />
+          </div>
+          <div>
+            <button
+              onClick={handleLogin}
+              className="dark-btn dark-btn-primary w-full flex items-center justify-center space-x-2"
+            >
+              <LogIn size={20} />
+              <span>Sign In</span>
+            </button>
+          </div>
+          <div className="text-center">
+            <span className="text-dark-300">
+              Don't have an account? 
+              <button 
+                onClick={() => navigate('/signup')}
+                className="ml-2 text-dark-300 hover:text-dark-50 transition-colors"
+              >
+                Sign Up
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
