@@ -41,20 +41,22 @@ const Home = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <div className="flex justify-end space-x-4">
-        <button 
-          onClick={() => navigate('/login')} 
-          className="bg-dark-200 text-dark-400 px-6 py-3 rounded-lg hover:bg-dark-300 transition-colors"
-        >
-          Login
-        </button>
-        <button 
-          onClick={() => navigate('/signup')} 
-          className="bg-dark-300 text-dark-50 px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Signup
-        </button>
-      </div>
+      {!token && (
+        <div className="flex justify-end space-x-4">
+          <button 
+            onClick={() => navigate('/login')} 
+            className="bg-dark-200 text-dark-400 px-6 py-3 rounded-lg hover:bg-dark-300 transition-colors"
+          >
+            Login
+          </button>
+          <button 
+            onClick={() => navigate('/signup')} 
+            className="bg-dark-300 text-dark-50 px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Signup
+          </button>
+        </div>
+      )}
 
       <div className="bg-dark-100 rounded-xl p-6 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
@@ -73,7 +75,8 @@ const Home = () => {
           {topics.map((topic) => (
             <li 
               key={topic.id} 
-              className="group flex items-center justify-between bg-dark-200 hover:bg-dark-300/20 transition-all duration-300 rounded-lg p-4"
+              className="group flex items-center justify-between bg-dark-200 hover:bg-dark-300/20 transition-all duration-300 rounded-lg p-4 cursor-pointer"
+              onClick={() => navigate(`/topics/${topic.id}`)}
             >
               <div>
                 <h3 className="text-lg font-semibold text-dark-400 group-hover:text-dark-300 transition-colors">
@@ -81,12 +84,7 @@ const Home = () => {
                 </h3>
                 <p className="text-gray-400 text-sm">{topic.description || 'No description'}</p>
               </div>
-              <button 
-                onClick={() => navigate(`/topics/${topic.id}`)}
-                className="text-dark-300 hover:bg-dark-300/20 p-2 rounded-full transition-all"
-              >
-                <ChevronRight className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              <ChevronRight className="text-dark-300 group-hover:translate-x-1 transition-transform" />
             </li>
           ))}
         </ul>

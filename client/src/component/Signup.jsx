@@ -36,7 +36,7 @@ const Signup = () => {
             Create Your Account
           </h2>
           <p className="mt-2 text-sm text-dark-300">
-            Start your journey with us today
+            Sign Up, Quick and Easy
           </p>
         </div>
         <div className="space-y-6">
@@ -46,7 +46,7 @@ const Signup = () => {
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="dark-input w-full"
+              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
               required
             />
             <input
@@ -54,7 +54,7 @@ const Signup = () => {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="dark-input w-full"
+              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
               required
             />
             <input
@@ -62,7 +62,7 @@ const Signup = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="dark-input w-full"
+              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
               required
             />
           </div>
