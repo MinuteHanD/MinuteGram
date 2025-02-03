@@ -47,10 +47,17 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll();
+
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+
+                    auth.requestMatchers("/api/moderation/posts/**").hasAnyRole("MODERATOR", "ADMIN");
+                    auth.requestMatchers("/api/moderation/comments/**").hasAnyRole("MODERATOR", "ADMIN");
+                    auth.requestMatchers("/api/moderation/users/ban").hasAnyRole("MODERATOR", "ADMIN");
+
+
                     auth.requestMatchers("/api/posts/**").authenticated();
                     auth.requestMatchers("/api/users/**").authenticated();
-                    auth.requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll();
                     auth.requestMatchers("/api/comments/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
@@ -66,6 +73,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app"));
+        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173/"));
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

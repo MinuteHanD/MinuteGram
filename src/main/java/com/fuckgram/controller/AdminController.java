@@ -1,8 +1,10 @@
 package com.fuckgram.controller;
 
-
+import com.fuckgram.entity.Role;
+import com.fuckgram.entity.User;
 import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.UserRepository;
+import com.fuckgram.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +19,31 @@ public class AdminController {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private AdminService adminService;
+
+    @PostMapping("/users/{userId}/ban")
+    public ResponseEntity<?> banUser(@PathVariable Long userId) {
+        User bannedUser = adminService.banUser(userId);
+        return ResponseEntity.ok(bannedUser);
+    }
+
+    @PostMapping("/users/{userId}/unban")
+    public ResponseEntity<?> unbanUser(@PathVariable Long userId) {
+        User unbannedUser = adminService.unbanUser(userId);
+        return ResponseEntity.ok(unbannedUser);
+    }
+
+    @PostMapping("/users/{userId}/role")
+    public ResponseEntity<?> updateUserRole(
+            @PathVariable Long userId,
+            @RequestParam Role newRole
+    ) {
+        User updatedUser = adminService.updateUserRole(userId, newRole);
+        return ResponseEntity.ok(updatedUser);
+    }
+
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId){
@@ -35,6 +62,4 @@ public class AdminController {
     public ResponseEntity<?> getAllUsers(){
         return ResponseEntity.ok(userRepository.findAll());
     }
-
-
 }
