@@ -14,9 +14,13 @@ const Login = () => {
       
       const response = await api.post('/auth/login', { email, password });
       console.log('Login response:', response.data);
+
+      
       
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRoles', JSON.stringify(response.data.roles));
+        localStorage.setItem('userEmail', response.data.email);
         console.log('Token stored:', response.data.token);
         
         navigate('/');

@@ -1,15 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
-import { ChevronRight, Plus } from 'lucide-react';
+import { Shield, ChevronRight, Plus } from 'lucide-react';
 
 const Home = () => {
+  
   const [topics, setTopics] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
   const [newTopicDescription, setNewTopicDescription] = useState('');
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const [userRole, setUserRole] = useState(null);
+
+  const fetchUserRole = async () => {
+    if (token) {
+      try {
+        const response = await api.get('/users/current');
+        
+        const roles = response.data.roles;
+        setUserRole(roles);
+      } catch (err) {
+        console.error('Failed to fetch user role:', err);
+      }
+    }
+  };
 
   const fetchTopics = async () => {
     try {
@@ -37,7 +52,43 @@ const Home = () => {
 
   useEffect(() => {
     fetchTopics();
-  }, []);
+    fetchUserRole();
+  }, [token]);
+
+  const hasRole = (roleToCheck) => {
+    return userRole?.includes(roleToCheck);
+  };
+
+  const renderDashboardButton = () => {
+    if (!token || !userRole) return null;
+
+    if (hasRole('ADMIN')) {
+      return (
+        <button
+          onClick={() => navigate('/admin')}
+          className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-red-700 transition-colors"
+        >
+          <Shield size={20} />
+          <span>Admin Dashboard</span>
+        </button>
+      );
+    }
+
+    if (hasRole('MODERATOR')) {
+      return (
+        <button
+          onClick={() => navigate('/moderator-dashboard')}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
+        >
+          <Shield size={20} />
+          <span>Moderator Dashboard</span>
+        </button>
+      );
+    }
+
+    return null;
+  };
+
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
@@ -57,6 +108,8 @@ const Home = () => {
           </button>
         </div>
       )}
+
+      {renderDashboardButton()}
 
       <div className="bg-dark-100 rounded-xl p-6 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
