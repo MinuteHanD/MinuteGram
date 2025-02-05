@@ -12,7 +12,7 @@ public class CommentResponseDto {
     private LocalDateTime createdAt;
     private Long parentCommentId;
     private List<CommentResponseDto> replies;
-
+    private String postTitle;  
 
     public static CommentResponseDto fromEntity(Comment comment) {
         CommentResponseDto dto = new CommentResponseDto();
@@ -20,12 +20,22 @@ public class CommentResponseDto {
         dto.setContent(comment.getContent());
         dto.setAuthorName(comment.getUser().getName());
         dto.setCreatedAt(comment.getCreatedAt());
+        dto.setPostTitle(comment.getPost().getTitle());
 
         if (comment.getParentComment() != null) {
             dto.setParentCommentId(comment.getParentComment().getId());
         }
 
         return dto;
+    }
+
+
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
     }
 
     public List<CommentResponseDto> getReplies() {

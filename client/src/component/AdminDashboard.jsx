@@ -12,14 +12,14 @@ import {
 import api from '../service/apiClient';
 
 const AdminDashboard = () => {
-  // State management for all features
+  
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
   const [topics, setTopics] = useState([]);
   const [users, setUsers] = useState([]);
   const [activeView, setActiveView] = useState('posts');
 
-  // Initial data fetching
+ 
   useEffect(() => {
     fetchPosts();
     fetchComments();
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
     fetchUsers();
   }, []);
 
-  // Fetch functions for all data types
+ 
   const fetchPosts = async () => {
     try {
       const response = await api.get('/admin/posts');
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Delete handlers for existing features
+ 
   const handleDeletePost = async (postId) => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
     try {
@@ -105,7 +105,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // User management handlers from old version
+  
   const handleRoleChange = async (userId, newRole) => {
     try {
       await api.post(`/admin/users/${userId}/role?newRole=${newRole}`);
@@ -139,7 +139,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // View renderers for existing features
+  
   const renderPostsView = () => (
     <div>
       <h2 className="text-xl font-semibold mb-6 flex items-center">
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
             {posts.map(post => (
               <tr key={post.id} className="border-b border-dark-300/10 hover:bg-dark-300/5">
                 <td className="py-4 px-4">{post.title}</td>
-                <td className="py-4 px-4">{post.author}</td>
+                <td className="py-4 px-4">{post.authorName}</td>
                 <td className="py-4 px-4">{new Date(post.createdAt).toLocaleDateString()}</td>
                 <td className="py-4 px-4 flex space-x-2">
                   <button 
@@ -191,6 +191,7 @@ const AdminDashboard = () => {
               <th className="py-4 px-4 text-left">Content</th>
               <th className="py-4 px-4 text-left">Author</th>
               <th className="py-4 px-4 text-left">Post</th>
+              <th className="py-4 px-4 text-left">Created At</th>
               <th className="py-4 px-4 text-left">Actions</th>
             </tr>
           </thead>
@@ -198,8 +199,9 @@ const AdminDashboard = () => {
             {comments.map(comment => (
               <tr key={comment.id} className="border-b border-dark-300/10 hover:bg-dark-300/5">
                 <td className="py-4 px-4 max-w-xs truncate">{comment.content}</td>
-                <td className="py-4 px-4">{comment.author}</td>
+                <td className="py-4 px-4">{comment.authorName}</td>
                 <td className="py-4 px-4">{comment.postTitle}</td>
+                <td className="py-4 px-4">{new Date(comment.createdAt).toLocaleDateString()}</td>
                 <td className="py-4 px-4 flex space-x-2">
                   <button 
                     onClick={() => handleDeleteComment(comment.id)}
@@ -254,7 +256,7 @@ const AdminDashboard = () => {
     </div>
   );
 
-  // New users view with stats from old version
+  
   const renderUsersView = () => (
     <div>
       <h2 className="text-xl font-semibold mb-6 flex items-center">
