@@ -9,11 +9,11 @@ export default {
     extend: {
       colors: {
         dark: {
-          50: '#121212',    // Deepest background
-          100: '#1E1E1E',   // Slightly lighter background
-          200: '#2A2A2A',   // Card/section background
-          300: '#E94560',   // Accent color (vibrant red)
-          400: '#FFFFFF',   // Text color
+          50: '#121212',    
+          100: '#1E1E1E',   
+          200: '#2A2A2A',   
+          300: '#E94560',   
+          400: '#FFFFFF',   
         }
       },
       fontFamily: {

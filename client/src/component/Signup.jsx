@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../service/apiClient';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Mail, Lock, User } from 'lucide-react';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +9,7 @@ const Signup = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
 
+ 
   const handleSignup = async () => {
     try {
       const response = await api.post('/auth/signup', {
@@ -29,62 +30,71 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-dark-100 p-8 rounded-xl shadow-2xl">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-dark-400">
-            Create Your Account
-          </h2>
-          <p className="mt-2 text-sm text-dark-300">
-            Sign Up, Quick and Easy
-          </p>
-        </div>
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
-              required
-            />
+    <div className="min-h-screen bg-gradient-to-b from-dark-100 to-dark-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-dark-100/50 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-dark-300/10 space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
+              Create Account
+            </h2>
+            <p className="text-dark-300/80">Join our community today</p>
           </div>
-          <div>
-            <button
+          
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="relative">
+                <User className="absolute left-4 top-3.5 h-5 w-5 text-dark-300/50" />
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-dark-100/50 text-dark-400 pl-12 pr-4 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-dark-300/50" />
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-dark-100/50 text-dark-400 pl-12 pr-4 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-dark-300/50" />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-dark-100/50 text-dark-400 pl-12 pr-4 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
+                  required
+                />
+              </div>
+            </div>
+
+            <button 
               onClick={handleSignup}
-              className="dark-btn dark-btn-primary w-full flex items-center justify-center space-x-2"
+              className="w-full bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center justify-center space-x-3"
             >
-              <UserPlus size={20} />
-              <span>Sign Up</span>
+              <UserPlus className="h-5 w-5" />
+              <span className="font-medium">Create Account</span>
             </button>
-          </div>
-          <div className="text-center">
-            <span className="text-dark-300">
-              Already have an account? 
+
+            <div className="text-center">
               <button 
                 onClick={() => navigate('/login')}
-                className="ml-2 text-dark-300 hover:text-dark-50 transition-colors"
+                className="text-dark-300 hover:text-dark-400 transition-colors duration-300"
               >
-                Log In
+                Already have an account? Sign in
               </button>
-            </span>
+            </div>
           </div>
         </div>
       </div>

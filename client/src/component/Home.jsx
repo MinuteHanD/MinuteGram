@@ -4,7 +4,6 @@ import api from '../service/apiClient';
 import { Shield, ChevronRight, Plus } from 'lucide-react';
 
 const Home = () => {
-  
   const [topics, setTopics] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
@@ -13,11 +12,11 @@ const Home = () => {
   const token = localStorage.getItem('token');
   const [userRole, setUserRole] = useState(null);
 
+  // Existing logic remains unchanged...
   const fetchUserRole = async () => {
     if (token) {
       try {
         const response = await api.get('/users/current');
-        
         const roles = response.data.roles;
         setUserRole(roles);
       } catch (err) {
@@ -28,7 +27,7 @@ const Home = () => {
 
   const fetchTopics = async () => {
     try {
-      const response = await api.get('/topics'); 
+      const response = await api.get('/topics');
       setTopics(response.data.content);
     } catch (err) {
       console.error(err);
@@ -43,7 +42,7 @@ const Home = () => {
       setShowForm(false);
       setNewTopicName('');
       setNewTopicDescription('');
-      fetchTopics(); 
+      fetchTopics();
     } catch (err) {
       console.error(err);
       alert('Failed to create topic');
@@ -66,10 +65,10 @@ const Home = () => {
       return (
         <button
           onClick={() => navigate('/admin')}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-red-700 transition-colors"
+          className="bg-red-600 text-white px-6 py-3 rounded-lg flex items-center space-x-3 hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-red-600/20"
         >
-          <Shield size={20} />
-          <span>Admin Dashboard</span>
+          <Shield className="w-5 h-5" />
+          <span className="font-medium">Admin Dashboard</span>
         </button>
       );
     }
@@ -78,10 +77,10 @@ const Home = () => {
       return (
         <button
           onClick={() => navigate('/moderator-dashboard')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center space-x-3 hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-blue-600/20"
         >
-          <Shield size={20} />
-          <span>Moderator Dashboard</span>
+          <Shield className="w-5 h-5" />
+          <span className="font-medium">Moderator Dashboard</span>
         </button>
       );
     }
@@ -89,92 +88,102 @@ const Home = () => {
     return null;
   };
 
-
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      {!token && (
-        <div className="flex justify-end space-x-4">
-          <button 
-            onClick={() => navigate('/login')} 
-            className="bg-dark-200 text-dark-400 px-6 py-3 rounded-lg hover:bg-dark-300 transition-colors"
-          >
-            Login
-          </button>
-          <button 
-            onClick={() => navigate('/signup')} 
-            className="bg-dark-300 text-dark-50 px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Signup
-          </button>
-        </div>
-      )}
-
-      {renderDashboardButton()}
-
-      <div className="bg-dark-100 rounded-xl p-6 shadow-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-dark-400">Community Topics</h2>
-          {token && (
+    <div className="min-h-screen bg-gradient-to-b from-dark-100 to-dark-200">
+      <div className="max-w-5xl mx-auto px-6 py-12 space-y-8">
+        {/* Auth Buttons */}
+        {!token && (
+          <div className="flex justify-end space-x-4">
             <button 
-              onClick={() => setShowForm(!showForm)} 
-              className="bg-dark-300 text-dark-50 p-2 rounded-full hover:opacity-90 transition-opacity"
+              onClick={() => navigate('/login')} 
+              className="bg-dark-200 text-dark-400 px-8 py-3 rounded-lg hover:bg-dark-300 transition-all duration-300 shadow-lg hover:shadow-dark-300/20"
             >
-              <Plus />
-            </button>
-          )}
-        </div>
-
-        <ul className="space-y-3">
-          {topics.map((topic) => (
-            <li 
-              key={topic.id} 
-              className="group flex items-center justify-between bg-dark-200 hover:bg-dark-300/20 transition-all duration-300 rounded-lg p-4 cursor-pointer"
-              onClick={() => navigate(`/topics/${topic.id}`)}
-            >
-              <div>
-                <h3 className="text-lg font-semibold text-dark-400 group-hover:text-dark-300 transition-colors">
-                  {topic.name}
-                </h3>
-                <p className="text-gray-400 text-sm">{topic.description || 'No description'}</p>
-              </div>
-              <ChevronRight className="text-dark-300 group-hover:translate-x-1 transition-transform" />
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {token && showForm && (
-        <div className="bg-dark-200 rounded-xl p-6 space-y-4">
-          <h3 className="text-xl font-semibold text-dark-400">Create New Topic</h3>
-          <input
-            type="text"
-            placeholder="Topic Name"
-            value={newTopicName}
-            onChange={(e) => setNewTopicName(e.target.value)}
-            className="w-full bg-dark-100 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all"
-          />
-          <textarea
-            placeholder="Topic Description"
-            value={newTopicDescription}
-            onChange={(e) => setNewTopicDescription(e.target.value)}
-            className="w-full bg-dark-100 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all h-24"
-          />
-          <div className="flex space-x-4">
-            <button 
-              onClick={createTopic} 
-              className="bg-dark-300 text-dark-50 px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Create
+              Login
             </button>
             <button 
-              onClick={() => setShowForm(false)} 
-              className="bg-dark-200 text-dark-400 px-6 py-2 rounded-lg hover:bg-dark-300/20 transition-colors"
+              onClick={() => navigate('/signup')} 
+              className="bg-dark-300 text-dark-50 px-8 py-3 rounded-lg hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20"
             >
-              Cancel
+              Signup
             </button>
           </div>
+        )}
+
+        {renderDashboardButton()}
+
+        {/* Main Content */}
+        <div className="bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-dark-300/10">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-4xl font-bold text-dark-400 bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
+              Community Topics
+            </h2>
+            {token && (
+              <button 
+                onClick={() => setShowForm(!showForm)} 
+                className="bg-dark-300 text-dark-50 p-3 rounded-full hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 hover:scale-105"
+              >
+                <Plus className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+
+          <ul className="space-y-4">
+            {topics.map((topic) => (
+              <li 
+                key={topic.id} 
+                className="group bg-dark-200/50 hover:bg-dark-300/20 transition-all duration-300 rounded-xl p-6 cursor-pointer border border-dark-300/10 hover:border-dark-300/30 shadow-lg hover:shadow-xl"
+                onClick={() => navigate(`/topics/${topic.id}`)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold text-dark-400 group-hover:text-dark-300 transition-colors">
+                      {topic.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {topic.description || 'No description'}
+                    </p>
+                  </div>
+                  <ChevronRight className="w-6 h-6 text-dark-300 group-hover:translate-x-2 transition-all duration-300" />
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
+
+        {/* Create Topic Form */}
+        {token && showForm && (
+          <div className="bg-dark-200/50 backdrop-blur-sm rounded-2xl p-8 space-y-6 shadow-2xl border border-dark-300/10">
+            <h3 className="text-2xl font-bold text-dark-400">Create New Topic</h3>
+            <input
+              type="text"
+              placeholder="Topic Name"
+              value={newTopicName}
+              onChange={(e) => setNewTopicName(e.target.value)}
+              className="w-full bg-dark-100/50 text-dark-400 px-6 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
+            />
+            <textarea
+              placeholder="Topic Description"
+              value={newTopicDescription}
+              onChange={(e) => setNewTopicDescription(e.target.value)}
+              className="w-full bg-dark-100/50 text-dark-400 px-6 py-4 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 h-32 placeholder:text-dark-400/50 resize-none"
+            />
+            <div className="flex space-x-4">
+              <button 
+                onClick={createTopic} 
+                className="bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20"
+              >
+                Create
+              </button>
+              <button 
+                onClick={() => setShowForm(false)} 
+                className="bg-dark-200 text-dark-400 px-8 py-3 rounded-xl hover:bg-dark-300/20 transition-all duration-300 shadow-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

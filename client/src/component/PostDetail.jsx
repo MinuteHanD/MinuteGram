@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send, User, Clock, ThumbsUp } from 'lucide-react';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -36,62 +36,127 @@ const PostDetails = () => {
     fetchPostDetails();
   }, [postId]);
 
-  if (!post) return <p className="text-dark-300">Loading...</p>;
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 flex items-center justify-center">
+        <div className="bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-lg animate-pulse">
+          <div className="h-6 w-32 bg-dark-300/20 rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-2xl mx-auto bg-dark-50 p-6 space-y-6">
-      <div className="bg-dark-100 rounded-xl p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-dark-400 mb-4">{post.title}</h2>
-        <p className="text-dark-300 mb-4">{post.content}</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 p-6">
+      <div className="max-w-4xl mx-auto py-8 space-y-8">
+        {/* Post Content */}
+        <div className="bg-dark-100/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-dark-300/10">
+          <div className="space-y-6">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
+              {post.title}
+            </h2>
+            
+            <div className="flex items-center space-x-6 text-dark-300/70">
+              <div className="flex items-center space-x-2">
+                <div className="bg-dark-300/10 p-2 rounded-lg">
+                  <User className="w-4 h-4" />
+                </div>
+                <span className="font-medium">{post.authorName || 'Anonymous'}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="bg-dark-300/10 p-2 rounded-lg">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
 
-      <div className="bg-dark-100 rounded-xl p-6 shadow-lg space-y-4">
-        <div className="flex items-center space-x-2 mb-4">
-          <MessageSquare className="text-dark-300" />
-          <h3 className="text-xl font-semibold text-dark-400">Comments</h3>
+            <div className="border-t border-dark-300/10 pt-6">
+              <p className="text-dark-400 leading-relaxed text-lg whitespace-pre-wrap">
+                {post.content}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {comments.length > 0 ? (
-          comments.map((comment) => (
-            <div key={comment.id} className="bg-dark-200 p-4 rounded-lg border border-dark-300/20">
-              <p className="text-dark-300">{comment.content}</p>
-              <small className="text-dark-300 italic">- {comment.authorName}</small>
+        {/* Comments Section */}
+        <div className="bg-dark-100/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-dark-300/10">
+          <div className="flex items-center space-x-4 mb-8">
+            <div className="bg-dark-300/10 p-3 rounded-xl">
+              <MessageSquare className="w-6 h-6 text-dark-300" />
             </div>
-          ))
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-dark-400 font-bold text-xl">No comments yet.</p>
-            <p className="text-dark-400 font-bold text-lg mt-2">Share your thoughts</p>
+            <h3 className="text-2xl font-bold text-dark-400">
+              Comments ({comments.length})
+            </h3>
           </div>
-        )}
 
-        {token ? (
-          <div className="mt-4 flex space-x-4">
-            <textarea
-              placeholder="Write a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="w-full bg-dark-200 text-dark-400 px-4 py-2 rounded-lg border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all h-24"
-            />
-            <button 
-              onClick={addComment} 
-              className="dark-btn dark-btn-primary flex items-center space-x-2"
-              disabled={!newComment.trim()}
-            >
-              <Send size={20} />
-              <span>Send</span>
-            </button>
-          </div>
-        ) : (
-          <div className="text-center">
-            <button 
-              onClick={() => navigate('/login')}
-              className="dark-btn dark-btn-secondary"
-            >
-              Login to Comment
-            </button>
-          </div>
-        )}
+          {comments.length > 0 ? (
+            <div className="space-y-6">
+              {comments.map((comment) => (
+                <div 
+                  key={comment.id} 
+                  className="group bg-dark-200/50 p-6 rounded-2xl border border-dark-300/10 hover:border-dark-300/30 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <p className="text-dark-300 mb-4 leading-relaxed">{comment.content}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 text-dark-300/70">
+                      <div className="bg-dark-300/10 p-2 rounded-lg">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <span className="font-medium">{comment.authorName}</span>
+                      <span>•</span>
+                      <span className="text-sm">
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <ThumbsUp className="w-4 h-4 text-dark-300/50 hover:text-dark-300 transition-colors" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 space-y-4">
+              <div className="bg-dark-300/10 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
+                <MessageSquare className="w-10 h-10 text-dark-300/50" />
+              </div>
+              <p className="text-2xl font-bold text-dark-400">No comments yet</p>
+              <p className="text-dark-300">Be the first to share your thoughts</p>
+            </div>
+          )}
+
+          {token ? (
+            <div className="mt-8 space-y-4">
+              <textarea
+                placeholder="Write your comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="w-full bg-dark-100/50 text-dark-400 px-6 py-4 rounded-2xl border border-dark-300/20 focus:border-dark-300/40 focus:ring-2 focus:ring-dark-300/20 transition-all duration-300 h-32 placeholder:text-dark-400/50 resize-none"
+              />
+              <div className="flex justify-end">
+                <button 
+                  onClick={addComment} 
+                  className="bg-dark-300 text-dark-50 px-6 py-3 rounded-xl hover:bg-dark-400 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!newComment.trim()}
+                >
+                  <Send className="w-5 h-5" />
+                  <span className="font-medium">Post Comment</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-8 bg-dark-200/50 rounded-2xl p-6 text-center">
+              <button 
+                onClick={() => navigate('/login')}
+                className="bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:bg-dark-400 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center space-x-3 mx-auto"
+              >
+                <MessageSquare className="w-5 h-5" />
+                <span className="font-medium">Login to Comment</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

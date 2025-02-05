@@ -8,7 +8,7 @@ body {
   @apply bg-dark-50 text-dark-400 font-sans;
 }
 
-/* Scrollbar styling for dark mode */
+
 ::-webkit-scrollbar {
   @apply w-2 bg-dark-100;
 }
