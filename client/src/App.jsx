@@ -11,7 +11,6 @@ import ProtectedRoute from './component/ProtectedRoute';
 import AdminDashboard from './component/AdminDashboard';
 
 const App = () => {
-  
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem('darkMode') === 'true' || 
     window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -41,13 +40,11 @@ const App = () => {
               <Route 
                 path="/admin" 
                 element={
-                  <ProtectedRoute requiredRole="ADMIN">
+                  <ProtectedRoute adminOnly={true}>
                     <AdminDashboard />
                   </ProtectedRoute>
                 } 
               />
-
-
             </Routes>
           </div>
         </div>

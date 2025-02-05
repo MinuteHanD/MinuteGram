@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
 import { Shield, ChevronRight, Plus } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
 const Home = () => {
   const [topics, setTopics] = useState([]);
@@ -12,7 +13,7 @@ const Home = () => {
   const token = localStorage.getItem('token');
   const [userRole, setUserRole] = useState(null);
 
-  // Existing logic remains unchanged...
+  
   const fetchUserRole = async () => {
     if (token) {
       try {
@@ -59,9 +60,11 @@ const Home = () => {
   };
 
   const renderDashboardButton = () => {
-    if (!token || !userRole) return null;
+    const { user } = useAuth();
 
-    if (hasRole('ADMIN')) {
+    if (!user || !user.isAdmin) return null;{
+
+    
       return (
         <button
           onClick={() => navigate('/admin')}
@@ -111,7 +114,7 @@ const Home = () => {
 
         {renderDashboardButton()}
 
-        {/* Main Content */}
+        
         <div className="bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-dark-300/10">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-4xl font-bold text-dark-400 bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
