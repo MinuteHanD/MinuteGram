@@ -1,33 +1,47 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../service/apiClient';  
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [userRoles, setUserRoles] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true); 
 
-  useEffect(() => {
-    // Check authentication on component mount
+  const fetchUserRole = async () => {
     const token = localStorage.getItem('token');
-    const roles = JSON.parse(localStorage.getItem('userRoles') || '[]');
-    console.log('User roles:', userRoles);
+    if (!token) {
+      setIsAuthenticated(false);
+      setUserRoles([]);
+      setAuthLoading(false);
+      return;
+    }
 
-    
-    if (token) {
+    try {
+      const response = await api.get('/users/current');
+      const roles = response.data.roles || [];
+
       setIsAuthenticated(true);
       setUserRoles(roles);
+      localStorage.setItem('userRoles', JSON.stringify(roles));  
+    } catch (err) {
+      console.error('Failed to fetch user:', err);
+      setIsAuthenticated(false);
+      setUserRoles([]);
+    } finally {
+      setAuthLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchUserRole();
   }, []);
 
-  const hasRole = (role) => {
-    console.log("Checking role:", role, "against:", userRoles);
-    return userRoles.includes(role);
-  };
+  const hasRole = (role) => userRoles.includes(role);
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userRoles');
-    localStorage.removeItem('userEmail');
     setIsAuthenticated(false);
     setUserRoles([]);
   };
@@ -37,7 +51,8 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated, 
       userRoles, 
       hasRole,
-      logout 
+      logout,
+      authLoading  
     }}>
       {children}
     </AuthContext.Provider>

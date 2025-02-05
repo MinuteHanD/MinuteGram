@@ -53,7 +53,7 @@ const Home = () => {
   useEffect(() => {
     fetchTopics();
     fetchUserRole();
-  }, [token]);
+  }, []);
 
   const hasRole = (roleToCheck) => {
     return userRole?.includes(roleToCheck);
