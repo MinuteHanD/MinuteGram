@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
           const response = await api.get('/users/current');
           setUser({
             ...response.data,
-            isAdmin: response.data.roles.includes('ADMIN')
+            isAdmin: response.data.roles.includes('ADMIN'),
+            isModerator: response.data.roles.includes('MODERATOR')
           });
         } catch {
           // Token invalid, logout
@@ -54,7 +55,8 @@ export const AuthProvider = ({ children }) => {
       login, 
       logout,
       isAuthenticated: !!user,
-      isAdmin: user?.isAdmin || false
+      isAdmin: user?.isAdmin || false,
+      isModerator: user?.isModerator || false
     }}>
       {children}
     </AuthContext.Provider>

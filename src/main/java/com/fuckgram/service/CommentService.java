@@ -78,6 +78,27 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    public List<CommentResponseDto> getAllComments() {
+        // Fetch all top-level comments across all posts
+        List<Comment> comments = commentRepository.findAll();
+
+        // Convert to DTOs with nested replies
+        return comments.stream()
+                .filter(comment -> comment.getParentComment() == null) // Only top-level comments
+                .map(comment -> {
+                    CommentResponseDto dto = CommentResponseDto.fromEntity(comment);
+
+                    // Fetch and attach replies
+                    List<CommentResponseDto> replies = commentRepository.findByParentCommentIdOrderByCreatedAt(comment.getId())
+                            .stream()
+                            .map(CommentResponseDto::fromEntity)
+                            .collect(Collectors.toList());
+                    dto.setReplies(replies);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
 }

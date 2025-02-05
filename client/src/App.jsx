@@ -9,6 +9,8 @@ import Navbar from './component/Navbar';
 import { AuthProvider } from './component/AuthContext';
 import ProtectedRoute from './component/ProtectedRoute';
 import AdminDashboard from './component/AdminDashboard';
+import ModeratorDashboard from './component/ModeratorDashboard';
+import ProfilePage from './component/ProfilePage';
 
 const App = () => {
   const [darkMode, setDarkMode] = useState(
@@ -36,7 +38,8 @@ const App = () => {
               <Route path="/signup" element={<Signup />} />
               <Route path="/topics/:topicId" element={<TopicPage />} />
               <Route path="/posts/:postId" element={<PostDetail />} />
-              
+              <Route path="/profile" element={<ProfilePage />} />
+             {/* <Route path="/moderation" element={<ModeratorDashboard />} /> */}
               <Route 
                 path="/admin" 
                 element={
@@ -45,6 +48,16 @@ const App = () => {
                   </ProtectedRoute>
                 } 
               />
+              
+              <Route 
+                path="/moderation" 
+                element={
+                  <ProtectedRoute moderatorOnly={true}>
+                    <ModeratorDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              
             </Routes>
           </div>
         </div>

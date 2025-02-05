@@ -50,11 +50,15 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll();
 
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/moderation/**").hasRole("MODERATOR");
 
                     auth.requestMatchers("/api/moderation/posts/**").hasAnyRole("MODERATOR", "ADMIN");
                     auth.requestMatchers("/api/moderation/comments/**").hasAnyRole("MODERATOR", "ADMIN");
-                    auth.requestMatchers("/api/moderation/users/ban").hasAnyRole("MODERATOR", "ADMIN");
+                    auth.requestMatchers("/api/moderation/users/**").hasAnyRole("MODERATOR", "ADMIN");
 
+                    auth.requestMatchers("/api/moderation/posts").hasAnyRole("MODERATOR", "ADMIN");
+                    auth.requestMatchers("/api/moderation/comments").hasAnyRole("MODERATOR", "ADMIN");
+                    auth.requestMatchers("/api/moderation/users").hasAnyRole("MODERATOR", "ADMIN");
 
                     auth.requestMatchers("/api/posts/**").authenticated();
                     auth.requestMatchers("/api/users/**").authenticated();

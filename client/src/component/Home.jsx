@@ -12,7 +12,7 @@ const Home = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const [userRole, setUserRole] = useState(null);
-
+  const { user } = useAuth();
   
   const fetchUserRole = async () => {
     if (token) {
@@ -60,11 +60,9 @@ const Home = () => {
   };
 
   const renderDashboardButton = () => {
-    const { user } = useAuth();
+    if (!user) return null;
 
-    if (!user || !user.isAdmin) return null;{
-
-    
+    if (user.isAdmin) {
       return (
         <button
           onClick={() => navigate('/admin')}
@@ -79,7 +77,7 @@ const Home = () => {
     if (hasRole('MODERATOR')) {
       return (
         <button
-          onClick={() => navigate('/moderator-dashboard')}
+          onClick={() => navigate('/moderation')}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center space-x-3 hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-blue-600/20"
         >
           <Shield className="w-5 h-5" />
@@ -90,6 +88,7 @@ const Home = () => {
 
     return null;
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-dark-100 to-dark-200">

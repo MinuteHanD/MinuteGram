@@ -2,19 +2,16 @@ package com.fuckgram.service;
 
 import com.fuckgram.entity.User;
 import com.fuckgram.entity.Role;
-import com.fuckgram.repository.CommentRepository;
-import com.fuckgram.repository.PostRepository;
-import com.fuckgram.repository.TopicRepository;
 import com.fuckgram.repository.UserRepository;
+import com.fuckgram.repository.PostRepository;
+import com.fuckgram.repository.CommentRepository;
+import com.fuckgram.repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.Set;
-
 @Service
-public class AdminService {
+public class ModeratorService {
 
     @Autowired
     private UserRepository userRepository;
@@ -28,19 +25,22 @@ public class AdminService {
     @Autowired
     private TopicRepository topicRepository;
 
+
     @Transactional
     public User banUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
 
-        if (user.getRoles().contains(Role.ADMIN)) {
-            throw new RuntimeException("Cannot ban admin user");
+        if (user.getRoles().contains(Role.ADMIN) ||
+                user.getRoles().contains(Role.MODERATOR)) {
+            throw new RuntimeException("Insufficient permissions to ban this user");
         }
 
         user.setBanned(true);
         return userRepository.save(user);
     }
+
 
     @Transactional
     public User unbanUser(Long userId) {
@@ -51,22 +51,17 @@ public class AdminService {
         return userRepository.save(user);
     }
 
-    @Transactional
-    public User updateUserRole(Long userId, Role newRole) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRoles().contains(Role.ADMIN)) {
-            throw new RuntimeException("Cannot modify admin user's role");
+    @Transactional
+    public void deletePost(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new RuntimeException("Post not found");
         }
 
-        Set<Role> roles = user.getRoles();
-        roles.clear();
-        roles.add(newRole);
-        user.setRoles(roles);
 
-        return userRepository.save(user);
+        postRepository.deleteById(postId);
     }
+
 
     @Transactional
     public void deleteComment(Long commentId) {
@@ -78,15 +73,6 @@ public class AdminService {
         commentRepository.deleteById(commentId);
     }
 
-    @Transactional
-    public void deletePost(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new RuntimeException("Post not found");
-        }
-
-
-        postRepository.deleteById(postId);
-    }
 
     @Transactional
     public void deleteTopic(Long topicId) {
