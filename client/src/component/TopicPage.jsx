@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
-import { FileText, Plus, MessageSquare, ChevronRight } from 'lucide-react';
+import { FileText, Plus, MessageSquare, ChevronRight, X, Upload } from 'lucide-react';
 
 const TopicPage = () => {
   const { topicId } = useParams();
@@ -10,15 +10,14 @@ const TopicPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  // Existing logic remains unchanged
   const fetchPosts = async () => {
     try {
       const topicResponse = await api.get(`/topics/${topicId}`);
       setTopicName(topicResponse.data.name);
-
       const postsResponse = await api.get(`/topics/${topicId}/posts`);
       setPosts(postsResponse.data.content);
     } catch (err) {
@@ -26,17 +25,35 @@ const TopicPage = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const createPost = async () => {
     try {
-      await api.post('/posts', {
+      const formData = new FormData();
+      formData.append('post', JSON.stringify({
         title: newPostTitle,
         content: newPostContent,
-        topicName: topicName  
+        topicName: topicName
+      }));
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+
+      await api.post('/posts', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      alert('Post created successfully!');
+
       setShowForm(false);
+      setNewPostTitle('');
+      setNewPostContent('');
+      setImageFile(null);
       fetchPosts();
     } catch (err) {
+      console.error('Failed to create post:', err);
       alert('Failed to create post');
     }
   };
@@ -46,109 +63,128 @@ const TopicPage = () => {
   }, [topicId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-100 to-dark-200">
-      <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
-        <div className="bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-dark-300/10">
-          <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-zinc-900">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="bg-dark-300/10 p-3 rounded-xl">
-                <FileText className="w-6 h-6 text-dark-300" />
+              <div className="bg-zinc-800 p-3 rounded-lg">
+                <FileText className="w-6 h-6 text-emerald-400" />
               </div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
-                {topicName} Posts
-              </h2>
+              <h1 className="text-4xl font-bold text-zinc-100">
+                {topicName}
+              </h1>
             </div>
             {token && (
               <button 
-                onClick={() => setShowForm(!showForm)} 
-                className="bg-dark-300 text-dark-50 px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center space-x-3"
+                onClick={() => setShowForm(!showForm)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2 font-medium"
               >
                 <Plus className="w-5 h-5" />
-                <span className="font-medium">New Post</span>
+                <span>Create Post</span>
               </button>
             )}
           </div>
+        </div>
 
-          {posts.length > 0 ? (
-            <ul className="space-y-4">
-              {posts.map((post) => (
-                <li 
-                  key={post.id} 
-                  className="group bg-dark-200/50 hover:bg-dark-300/20 transition-all duration-300 rounded-xl border border-dark-300/10 hover:border-dark-300/30 shadow-lg hover:shadow-xl"
-                >
-                  <button 
-                    onClick={() => navigate(`/posts/${post.id}`)}
-                    className="w-full text-left p-6 flex items-center justify-between"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <MessageSquare className="w-5 h-5 text-dark-300/50" />
-                      <span className="text-lg font-medium text-dark-400 group-hover:text-dark-300 transition-colors">
-                        {post.title || 'Untitled Post'}
-                      </span>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-dark-300 group-hover:translate-x-2 transition-all duration-300" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="text-center py-16 space-y-4">
-              <div className="bg-dark-300/10 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <MessageSquare className="w-8 h-8 text-dark-300/50" />
+        {/* Create Post Form */}
+        {showForm && (
+          <div className="mb-12 bg-zinc-800/50 backdrop-blur-lg rounded-xl p-6 border border-zinc-700">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-zinc-100">Create New Post</h2>
+              <button 
+                onClick={() => setShowForm(false)}
+                className="text-zinc-400 hover:text-zinc-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              <div>
+                <input
+                  type="text"
+                  placeholder="Post Title"
+                  value={newPostTitle}
+                  onChange={(e) => setNewPostTitle(e.target.value)}
+                  className="w-full bg-zinc-900/50 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                />
               </div>
-              <p className="text-2xl font-bold text-dark-400">No posts here yet</p>
-              <p className="text-dark-300">Be the first to start a discussion</p>
+              <div>
+                <textarea
+                  placeholder="Write your post content..."
+                  value={newPostContent}
+                  onChange={(e) => setNewPostContent(e.target.value)}
+                  rows={6}
+                  className="w-full bg-zinc-900/50 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all resize-none"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <label className="bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 cursor-pointer transition-all group">
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <div className="flex items-center space-x-2 text-zinc-400 group-hover:text-zinc-200">
+                      <Upload className="w-5 h-5" />
+                      <span>{imageFile ? 'Change Image' : 'Add Image'}</span>
+                    </div>
+                  </label>
+                  {imageFile && (
+                    <span className="text-zinc-400 text-sm">
+                      {imageFile.name}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={createPost}
+                  disabled={!newPostTitle.trim() || !newPostContent.trim()}
+                  className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-zinc-100 px-6 py-2 rounded-lg transition-all duration-200 font-medium"
+                >
+                  Publish Post
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Posts List */}
+        <div className="space-y-4">
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <button 
+                key={post.id}
+                onClick={() => navigate(`/posts/${post.id}`)}
+                className="w-full bg-zinc-800/50 hover:bg-zinc-800 backdrop-blur-lg border border-zinc-700 hover:border-zinc-600 rounded-xl p-6 transition-all duration-200 group text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-zinc-900/50 p-2 rounded-lg group-hover:bg-emerald-500/10">
+                      <MessageSquare className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium text-zinc-100 group-hover:text-emerald-400 transition-colors">
+                        {post.title || 'Untitled Post'}
+                      </h3>
+                      <p className="text-sm text-zinc-400">
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-zinc-500 group-hover:text-emerald-400 transform group-hover:translate-x-1 transition-all" />
+                </div>
+              </button>
+            ))
+          ) : (
+            <div className="text-center py-20 bg-zinc-800/50 backdrop-blur-lg rounded-xl border border-zinc-700">
+              <MessageSquare className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-zinc-300 mb-2">No posts yet</h3>
+              <p className="text-zinc-500">Be the first to start a discussion</p>
             </div>
           )}
         </div>
-
-        {token && showForm && (
-          <div className="bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-dark-300/10 space-y-6">
-            <h3 className="text-2xl font-bold text-dark-400">Create New Post</h3>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Post Title"
-                value={newPostTitle}
-                onChange={(e) => setNewPostTitle(e.target.value)}
-                className="w-full bg-dark-100/50 text-dark-400 px-6 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
-              />
-              <textarea
-                placeholder="Post Content"
-                value={newPostContent}
-                onChange={(e) => setNewPostContent(e.target.value)}
-                className="w-full bg-dark-100/50 text-dark-400 px-6 py-4 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 h-48 placeholder:text-dark-400/50 resize-none"
-              />
-            </div>
-            <div className="flex space-x-4">
-              <button 
-                onClick={createPost} 
-                className="bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!newPostTitle.trim() || !newPostContent.trim()}
-              >
-                Create Post
-              </button>
-              <button 
-                onClick={() => setShowForm(false)} 
-                className="bg-dark-200 text-dark-400 px-8 py-3 rounded-xl hover:bg-dark-300/20 transition-all duration-300 shadow-lg"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-
-        {!token && (
-          <div className="text-center bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-dark-300/10">
-            <button 
-              onClick={() => navigate('/login')} 
-              className="bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center space-x-3 mx-auto"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span className="font-medium">Login to Create Post</span>
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

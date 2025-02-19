@@ -20,6 +20,10 @@ public class Post {
 
     @Column(nullable = false)
     private String content;
+
+    @Column
+    private String imageUrl;
+
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -94,6 +98,14 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
 }

@@ -1,101 +1,120 @@
 import React, { useState } from 'react';
 import api from '../service/apiClient';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Hexagon } from 'lucide-react';
 
 const Signup = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
  
-  const handleSignup = async () => {
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
     try {
-      const response = await api.post('/auth/signup', {
-        email: email,
-        password: password,
-        name: name
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      alert('Signup successful! Please log in.');
+      await api.post('/auth/signup', formData);
       navigate('/login');
     } catch (err) {
-      alert(`Signup failed: ${err.response?.data?.message || 'Unknown error occurred'}`);
+      alert(err.response?.data?.message || 'Something went wrong');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-100 to-dark-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
-        <div className="bg-dark-100/50 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-dark-300/10 space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
-              Create Account
-            </h2>
-            <p className="text-dark-300/80">Join our community today</p>
-          </div>
-          
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <div className="relative">
-                <User className="absolute left-4 top-3.5 h-5 w-5 text-dark-300/50" />
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-dark-100/50 text-dark-400 pl-12 pr-4 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
-                  required
-                />
-              </div>
+    <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-4">
+      {/* Logo Header */}
+      <div className="mb-8 flex items-center space-x-3">
+        <div className="bg-zinc-800/50 p-2 rounded-lg">
+          <Hexagon className="w-6 h-6 text-emerald-400" />
+        </div>
+        <span className="text-xl font-bold text-zinc-100">
+          MinuteGram
+        </span>
+      </div>
 
-              <div className="relative">
-                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-dark-300/50" />
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-dark-100/50 text-dark-400 pl-12 pr-4 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
-                  required
-                />
-              </div>
+      {/* Main Card */}
+      <div className="w-full max-w-md bg-zinc-800/50 backdrop-blur-lg border border-zinc-700 rounded-lg p-6 space-y-6">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-zinc-100">
+            Create your account
+          </h2>
+          <p className="text-zinc-400">
+            Join the MinuteGram community
+          </p>
+        </div>
 
-              <div className="relative">
-                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-dark-300/50" />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-dark-100/50 text-dark-400 pl-12 pr-4 py-3 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 placeholder:text-dark-400/50"
-                  required
-                />
-              </div>
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div className="space-y-4">
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+              <input
+                type="text"
+                name="name"
+                placeholder="Your name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full bg-zinc-900/50 text-zinc-100 pl-10 pr-4 py-2 rounded-lg border border-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-500"
+                required
+              />
             </div>
 
-            <button 
-              onClick={handleSignup}
-              className="w-full bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center justify-center space-x-3"
-            >
-              <UserPlus className="h-5 w-5" />
-              <span className="font-medium">Create Account</span>
-            </button>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full bg-zinc-900/50 text-zinc-100 pl-10 pr-4 py-2 rounded-lg border border-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-500"
+                required
+              />
+            </div>
 
-            <div className="text-center">
-              <button 
-                onClick={() => navigate('/login')}
-                className="text-dark-300 hover:text-dark-400 transition-colors duration-300"
-              >
-                Already have an account? Sign in
-              </button>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full bg-zinc-900/50 text-zinc-100 pl-10 pr-4 py-2 rounded-lg border border-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-500"
+                required
+              />
             </div>
           </div>
+
+          <button 
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <UserPlus className="w-5 h-5" />
+            <span>{isLoading ? 'Creating account...' : 'Create account'}</span>
+          </button>
+        </form>
+
+        <div className="text-center">
+          <button 
+            onClick={() => navigate('/login')}
+            className="text-zinc-400 hover:text-emerald-400 transition-colors"
+          >
+            Already have an account? Sign in
+          </button>
         </div>
       </div>
     </div>

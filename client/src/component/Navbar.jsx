@@ -1,98 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Moon, 
-  Sun, 
-  Home, 
-  LogOut, 
-  LogIn, 
-  UserPlus, 
-  User,
-  Settings 
-} from 'lucide-react';
+import { Hexagon, User, Settings, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
-const Navbar = ({ darkMode, toggleDarkMode }) => {
+const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const [isScrolled, setIsScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-   
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-dark-100 via-dark-100 to-dark-200 shadow-2xl backdrop-blur-lg bg-opacity-90 z-50 border-b border-dark-300/10">
-      <div className="container mx-auto px-4 max-w-7xl">
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 ${
+      isScrolled ? 'bg-zinc-900/95 backdrop-blur-lg shadow-lg' : 'bg-transparent'
+    }`}>
+      <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo/Brand */}
-          <div 
-            onClick={() => navigate('/')} 
-            className="flex items-center space-x-3 cursor-pointer group"
+          {/* Logo */}
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center space-x-3 group"
           >
-            <div className="bg-gradient-to-br from-red-500 to-red-700 p-2 rounded-full shadow-md group-hover:scale-105 transition-transform items-center space-x-4">
-              <Home size={20} className="text-white" />
+            <div className="bg-zinc-800/50 p-2 rounded-lg group-hover:bg-emerald-500/10 transition-all duration-200 relative overflow-hidden">
+              <Hexagon className="w-5 h-5 text-emerald-400 relative z-10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent">
+            <span className="text-lg font-bold text-zinc-100 group-hover:text-emerald-400 transition-colors">
               MinuteGram
             </span>
-          </div>
+          </button>
 
-          {/* Navigation Actions */}
+          {/* Auth Section */}
           <div className="flex items-center space-x-4">
-            {/* Dark Mode Toggle */}
-            <button 
-              onClick={toggleDarkMode}
-              className="p-2 text-dark-400 hover:text-dark-300 hover:bg-dark-200/50 rounded-full transition-all group"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <Sun size={20} className="group-hover:rotate-12 transition-transform" />
-              ) : (
-                <Moon size={20} className="group-hover:-rotate-12 transition-transform" />
-              )}
-            </button>
-
-            {/* Authentication Buttons */}
             {token ? (
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-red-500/10 to-red-600/10 text-red-600 px-4 py-2 rounded-full hover:from-red-500/20 hover:to-red-600/20 transition-all"
+                  className="bg-zinc-800/50 hover:bg-zinc-800 backdrop-blur-lg border border-zinc-700 hover:border-zinc-600 rounded-lg px-4 py-2 transition-all duration-200 flex items-center space-x-2"
                 >
-                  <User size={18} />
-                  <span className="font-medium">Profile</span>
+                  <User className="w-4 h-4 text-emerald-400" />
+                  <span className="text-zinc-100">Account</span>
                 </button>
 
-                {/* Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-dark-200 border border-dark-300/20 rounded-xl shadow-2xl py-2 z-50">
-                    <button 
+                  <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl py-1 backdrop-blur-lg">
+                    <button
                       onClick={() => {
                         navigate('/profile');
                         setDropdownOpen(false);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-left hover:bg-dark-300/10 transition-colors"
+                      className="flex items-center w-full px-4 py-2 text-zinc-100 hover:bg-zinc-700/50 transition-colors"
                     >
-                      <User size={16} className="mr-3" />
-                      My Profile
+                      <User className="w-4 h-4 mr-2 text-emerald-400" />
+                      Profile
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         navigate('/settings');
                         setDropdownOpen(false);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-left hover:bg-dark-300/10 transition-colors"
+                      className="flex items-center w-full px-4 py-2 text-zinc-100 hover:bg-zinc-700/50 transition-colors"
                     >
-                      <Settings size={16} className="mr-3" />
+                      <Settings className="w-4 h-4 mr-2 text-zinc-400" />
                       Settings
                     </button>
-                    <div className="border-t border-dark-300/20 my-2"></div>
-                    <button 
+                    <div className="border-t border-zinc-700 my-1" />
+                    <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-left text-red-600 hover:bg-red-500/10 transition-colors"
+                      className="flex items-center w-full px-4 py-2 text-red-400 hover:bg-zinc-700/50 transition-colors"
                     >
-                      <LogOut size={16} className="mr-3" />
+                      <LogOut className="w-4 h-4 mr-2" />
                       Logout
                     </button>
                   </div>
@@ -100,18 +90,18 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <button 
+                <button
                   onClick={() => navigate('/login')}
-                  className="flex items-center space-x-2 text-dark-400 hover:text-dark-300 px-4 py-2 rounded-full hover:bg-dark-200/50 transition-all"
+                  className="bg-zinc-800/50 hover:bg-zinc-800 backdrop-blur-lg border border-zinc-700 hover:border-zinc-600 text-zinc-100 px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2"
                 >
-                  <LogIn size={18} />
+                  <LogIn className="w-4 h-4" />
                   <span>Login</span>
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/signup')}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2"
                 >
-                  <UserPlus size={18} />
+                  <UserPlus className="w-4 h-4" />
                   <span>Sign Up</span>
                 </button>
               </div>

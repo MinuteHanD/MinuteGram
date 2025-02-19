@@ -5,7 +5,6 @@ const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState({}); 
 
-  
   const fetchPosts = async () => {
     try {
       const response = await api.get('/posts'); 
@@ -34,6 +33,12 @@ const Posts = () => {
       {posts.map((post) => (
         <div key={post.id} style={{ marginBottom: '2rem', border: '1px solid #ddd', padding: '1rem' }}>
           <h3>{post.title}</h3>
+          {/* Show thumbnail image if available */}
+          {post.imageUrl && (
+            <div style={{ marginBottom: '1rem' }}>
+              <img src={post.imageUrl} alt="Post Thumbnail" style={{ maxWidth: '100%' }} />
+            </div>
+          )}
           <p>{post.content}</p>
           <strong>Comments:</strong>
           <ul>
@@ -53,4 +58,4 @@ const Posts = () => {
   );
 };
 
-export default Posts;
+export default Post;

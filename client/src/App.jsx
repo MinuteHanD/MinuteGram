@@ -5,6 +5,7 @@ import Login from './component/Login';
 import Signup from './component/Signup';
 import TopicPage from './component/TopicPage';
 import PostDetail from './component/PostDetail';
+import CreatePost from './component/CreatePost'; // NEW: Create Post component
 import Navbar from './component/Navbar';
 import { AuthProvider } from './component/AuthContext';
 import ProtectedRoute from './component/ProtectedRoute';
@@ -31,15 +32,15 @@ const App = () => {
             darkMode={darkMode} 
             toggleDarkMode={() => setDarkMode(!darkMode)} 
           />
-          <div className="pt-16 container mx-auto px-4 sm:px-6 lg:px-8"> 
+          <div className="pt-16 container mx-auto px-4 sm:px-6 lg:px-8">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/topics/:topicId" element={<TopicPage />} />
+              <Route path="/posts/new" element={<CreatePost />} />  
               <Route path="/posts/:postId" element={<PostDetail />} />
               <Route path="/profile" element={<ProfilePage />} />
-             {/* <Route path="/moderation" element={<ModeratorDashboard />} /> */}
               <Route 
                 path="/admin" 
                 element={
@@ -48,7 +49,6 @@ const App = () => {
                   </ProtectedRoute>
                 } 
               />
-              
               <Route 
                 path="/moderation" 
                 element={
@@ -57,7 +57,6 @@ const App = () => {
                   </ProtectedRoute>
                 } 
               />
-              
             </Routes>
           </div>
         </div>

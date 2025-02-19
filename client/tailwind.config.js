@@ -7,6 +7,15 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      animation: {
+        'spin-slow': 'spin-slow 20s linear infinite',
+      },
+      keyframes: {
+        'spin-slow': {
+          'from': { transform: 'rotate(0deg)' },
+          'to': { transform: 'rotate(360deg)' },
+        }
+      },
       colors: {
         dark: {
           50: '#121212',    

@@ -8,11 +8,12 @@ public class PostResponseDto {
     private Long id;
     private String content;
     private String title;
-    private String authorName;  // Instead of whole User object
-    private String topicName;   // Instead of whole Topic object
+    private String authorName;
+    private String topicName;
+    private String imageUrl;
     private LocalDateTime createdAt;
 
-    // Constructor to convert from Post entity
+
     public static PostResponseDto fromEntity(Post post) {
         PostResponseDto dto = new PostResponseDto();
         dto.setId(post.getId());
@@ -20,6 +21,7 @@ public class PostResponseDto {
         dto.setTitle(post.getTitle());
         dto.setAuthorName(post.getUser().getName());
         dto.setTopicName(post.getTopic().getName());
+        dto.setImageUrl(post.getImageUrl());
         dto.setCreatedAt(post.getCreatedAt());
         return dto;
     }
@@ -71,5 +73,13 @@ public class PostResponseDto {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

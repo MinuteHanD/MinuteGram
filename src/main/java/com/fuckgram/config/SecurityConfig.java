@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 import java.util.Arrays;
 
@@ -35,6 +37,14 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    @Bean
+    public FilterRegistrationBean<MultipartFilter> multipartFilter() {
+        FilterRegistrationBean<MultipartFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new MultipartFilter());
+        registrationBean.addUrlPatterns("/*");
+        return registrationBean;
+    }
+
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
@@ -48,6 +58,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll();
+
 
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/moderation/**").hasRole("MODERATOR");
@@ -77,8 +89,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app"));
-        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173/"));
+        //configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));

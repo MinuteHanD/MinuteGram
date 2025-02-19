@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
-import { MessageSquare, Send, User, Clock, ThumbsUp } from 'lucide-react';
+import { MessageSquare, Send, User, Clock, ThumbsUp, ArrowLeft } from 'lucide-react';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -38,70 +38,105 @@ const PostDetails = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 flex items-center justify-center">
-        <div className="bg-dark-100/50 backdrop-blur-sm rounded-2xl p-8 shadow-lg animate-pulse">
-          <div className="h-6 w-32 bg-dark-300/20 rounded animate-pulse"></div>
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+        <div className="w-full max-w-5xl mx-4">
+          <div className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 animate-pulse space-y-4">
+            <div className="h-8 w-2/3 bg-zinc-700 rounded-lg" />
+            <div className="h-4 w-1/4 bg-zinc-700 rounded-lg" />
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-zinc-700 rounded-lg" />
+              <div className="h-4 w-full bg-zinc-700 rounded-lg" />
+              <div className="h-4 w-2/3 bg-zinc-700 rounded-lg" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 p-6">
-      <div className="max-w-4xl mx-auto py-8 space-y-8">
+    <div className="min-h-screen bg-zinc-900">
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center space-x-2 text-zinc-400 hover:text-emerald-400 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back to Posts</span>
+        </button>
+
         {/* Post Content */}
-        <div className="bg-dark-100/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-dark-300/10">
+        <article className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">
           <div className="space-y-6">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-dark-400 to-dark-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-zinc-100">
               {post.title}
-            </h2>
+            </h1>
             
-            <div className="flex items-center space-x-6 text-dark-300/70">
+            {/* Author Info */}
+            <div className="flex items-center space-x-6 text-zinc-400">
               <div className="flex items-center space-x-2">
-                <div className="bg-dark-300/10 p-2 rounded-lg">
-                  <User className="w-4 h-4" />
+                <div className="bg-zinc-900/50 p-2 rounded-lg">
+                  <User className="w-4 h-4 text-emerald-400" />
                 </div>
                 <span className="font-medium">{post.authorName || 'Anonymous'}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="bg-dark-300/10 p-2 rounded-lg">
-                  <Clock className="w-4 h-4" />
+                <div className="bg-zinc-900/50 p-2 rounded-lg">
+                  <Clock className="w-4 h-4 text-emerald-400" />
                 </div>
                 <span>{new Date(post.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
+            
+            {/* Image */}
+            {post.imageUrl && (
+              <div className="relative rounded-xl overflow-hidden bg-zinc-900/50">
+                <img 
+                  src={post.imageUrl} 
+                  alt="Post content" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Image failed to load:', post.imageUrl);
+                    e.target.style.display = 'none';
+                  }} 
+                />
+              </div>
+            )}
 
-            <div className="border-t border-dark-300/10 pt-6">
-              <p className="text-dark-400 leading-relaxed text-lg whitespace-pre-wrap">
+            {/* Content */}
+            <div className="border-t border-zinc-700 pt-6">
+              <p className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap">
                 {post.content}
               </p>
             </div>
           </div>
-        </div>
+        </article>
 
         {/* Comments Section */}
-        <div className="bg-dark-100/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-dark-300/10">
+        <section className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">
           <div className="flex items-center space-x-4 mb-8">
-            <div className="bg-dark-300/10 p-3 rounded-xl">
-              <MessageSquare className="w-6 h-6 text-dark-300" />
+            <div className="bg-zinc-900/50 p-3 rounded-lg">
+              <MessageSquare className="w-6 h-6 text-emerald-400" />
             </div>
-            <h3 className="text-2xl font-bold text-dark-400">
+            <h2 className="text-2xl font-bold text-zinc-100">
               Comments ({comments.length})
-            </h3>
+            </h2>
           </div>
 
+          {/* Comments List */}
           {comments.length > 0 ? (
             <div className="space-y-6">
               {comments.map((comment) => (
                 <div 
                   key={comment.id} 
-                  className="group bg-dark-200/50 p-6 rounded-2xl border border-dark-300/10 hover:border-dark-300/30 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="group bg-zinc-900/50 p-6 rounded-lg border border-zinc-700 hover:border-emerald-500/20 transition-all duration-200"
                 >
-                  <p className="text-dark-300 mb-4 leading-relaxed">{comment.content}</p>
+                  <p className="text-zinc-300 mb-4 leading-relaxed">{comment.content}</p>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3 text-dark-300/70">
-                      <div className="bg-dark-300/10 p-2 rounded-lg">
-                        <User className="w-4 h-4" />
+                    <div className="flex items-center space-x-3 text-zinc-400">
+                      <div className="bg-zinc-800 p-2 rounded-lg">
+                        <User className="w-4 h-4 text-emerald-400" />
                       </div>
                       <span className="font-medium">{comment.authorName}</span>
                       <span>•</span>
@@ -109,8 +144,8 @@ const PostDetails = () => {
                         {new Date(comment.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <ThumbsUp className="w-4 h-4 text-dark-300/50 hover:text-dark-300 transition-colors" />
+                    <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <ThumbsUp className="w-4 h-4 text-zinc-500 hover:text-emerald-400 transition-colors" />
                     </button>
                   </div>
                 </div>
@@ -118,26 +153,27 @@ const PostDetails = () => {
             </div>
           ) : (
             <div className="text-center py-12 space-y-4">
-              <div className="bg-dark-300/10 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
-                <MessageSquare className="w-10 h-10 text-dark-300/50" />
+              <div className="bg-zinc-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
+                <MessageSquare className="w-10 h-10 text-zinc-600" />
               </div>
-              <p className="text-2xl font-bold text-dark-400">No comments yet</p>
-              <p className="text-dark-300">Be the first to share your thoughts</p>
+              <p className="text-xl font-semibold text-zinc-300">No comments yet</p>
+              <p className="text-zinc-500">Be the first to share your thoughts</p>
             </div>
           )}
 
+          {/* Comment Form */}
           {token ? (
             <div className="mt-8 space-y-4">
               <textarea
                 placeholder="Write your comment..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="w-full bg-dark-100/50 text-dark-400 px-6 py-4 rounded-2xl border border-dark-300/20 focus:border-dark-300/40 focus:ring-2 focus:ring-dark-300/20 transition-all duration-300 h-32 placeholder:text-dark-400/50 resize-none"
+                className="w-full bg-zinc-900/50 text-zinc-100 px-6 py-4 rounded-lg border border-zinc-700 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 h-32 placeholder:text-zinc-600 resize-none"
               />
               <div className="flex justify-end">
                 <button 
                   onClick={addComment} 
-                  className="bg-dark-300 text-dark-50 px-6 py-3 rounded-xl hover:bg-dark-400 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
                   disabled={!newComment.trim()}
                 >
                   <Send className="w-5 h-5" />
@@ -146,17 +182,17 @@ const PostDetails = () => {
               </div>
             </div>
           ) : (
-            <div className="mt-8 bg-dark-200/50 rounded-2xl p-6 text-center">
+            <div className="mt-8 bg-zinc-900/50 rounded-lg p-6 text-center">
               <button 
                 onClick={() => navigate('/login')}
-                className="bg-dark-300 text-dark-50 px-8 py-3 rounded-xl hover:bg-dark-400 transition-all duration-300 shadow-lg hover:shadow-dark-300/20 flex items-center space-x-3 mx-auto"
+                className="bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-8 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 mx-auto"
               >
                 <MessageSquare className="w-5 h-5" />
                 <span className="font-medium">Login to Comment</span>
               </button>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );
