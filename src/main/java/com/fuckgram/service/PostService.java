@@ -32,7 +32,7 @@ public class PostService {
         this.storageService = storageService;
     }
 
-    private Post createPostEntity(PostCreateDto postDto, String imageUrl, Topic topic, User currentUser) { // Added imageUrl parameter
+    private Post createPostEntity(PostCreateDto postDto, String imageUrl, Topic topic, User currentUser) {
         Post post = new Post();
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
@@ -71,7 +71,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
     }
 
-    // Removed @Override as this method is not overriding any superclass method
+    
     public void deletePost(Long postId) {
         Post post = getPostById(postId);
         if (post.getImageUrl() != null) {

@@ -1,48 +1,52 @@
 package com.fuckgram.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 public class StorageService {
 
-    @Value("${app.upload.dir:${user.home}/minutegram/uploads}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
 
-    @Value("${app.base.url:http://localhost:8080}")
-    private String baseUrl;
+    public StorageService(
+            @Value("${cloudinary.cloud-name}") String cloudName,
+            @Value("${cloudinary.api-key}") String apiKey,
+            @Value("${cloudinary.api-secret}") String apiSecret) {
+        this.cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret));
+    }
 
     public String store(MultipartFile file) {
         try {
-            Path root = Paths.get(uploadDir);
-            if (!Files.exists(root)) {
-                Files.createDirectories(root);
-            }
-
-            // Generate unique filename
-            String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Files.copy(file.getInputStream(), root.resolve(filename));
-
-            return baseUrl + "/uploads/" + filename;
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto"));
+            return (String) uploadResult.get("secure_url");
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file", e);
+            throw new RuntimeException("Failed to upload file to Cloudinary", e);
         }
     }
 
     public void deleteFile(String fileUrl) {
         try {
-            String filename = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-            Path file = Paths.get(uploadDir).resolve(filename);
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file", e);
+            String publicId = extractPublicId(fileUrl);
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete file from Cloudinary", e);
         }
+    }
+
+    private String extractPublicId(String fileUrl) {
+        // Example URL: https://res.cloudinary.com/dabc123/image/upload/v1234567890/filename.jpg
+        String[] parts = fileUrl.split("/");
+        String fileName = parts[parts.length - 1];
+        return fileName.substring(0, fileName.lastIndexOf("."));
     }
 }

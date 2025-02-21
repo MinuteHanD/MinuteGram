@@ -33,12 +33,12 @@ public class PostController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponseDto> createPost(
-            @RequestPart("post") String postJson, // Accept as a raw string
+            @RequestPart("post") String postJson,
             @RequestPart(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal UserDetails userDetails) throws Exception {
 
-        ObjectMapper objectMapper = new ObjectMapper(); // JSON parser
-        PostCreateDto postDto = objectMapper.readValue(postJson, PostCreateDto.class); // Convert JSON to DTO
+        ObjectMapper objectMapper = new ObjectMapper();
+        PostCreateDto postDto = objectMapper.readValue(postJson, PostCreateDto.class);
 
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
