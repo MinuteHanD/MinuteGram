@@ -392,13 +392,10 @@ export const TopicPage = () => {
                 <div className="flex items-center gap-4 border-t border-zinc-700/50 pt-4">
                   <Button type="button" variant="secondary" onClick={openFilePicker}>
                     <ImageIcon className="w-5 h-5" />
-                    <span>Add Image</span>
+                    <span>Add Media</span>
                   </Button>
                   
-                  <Button type="button" variant="secondary">
-                    <LinkIcon className="w-5 h-5" />
-                    <span>Add Link</span>
-                  </Button>
+                  
                 </div>
 
                 {mediaPreview && (
