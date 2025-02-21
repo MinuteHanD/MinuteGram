@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -32,11 +33,12 @@ public class PostService {
         this.storageService = storageService;
     }
 
-    private Post createPostEntity(PostCreateDto postDto, String imageUrl, Topic topic, User currentUser) {
+    private Post createPostEntity(PostCreateDto postDto, String imageUrl, String mediaType, Topic topic, User currentUser) {
         Post post = new Post();
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setImageUrl(imageUrl);
+        post.setMediaType(mediaType);
         post.setUser(currentUser);
         post.setTopic(topic);
         return post;
@@ -50,7 +52,8 @@ public class PostService {
 
         User currentUser = userService.getCurrentUser();
 
-        Post post = createPostEntity(postDto, imageUrl, topic, currentUser);
+        String mediaType = null; // This will be set in the controller, not here
+        Post post = createPostEntity(postDto, imageUrl, mediaType, topic, currentUser);
         Post savedPost = postRepository.save(post);
 
         return PostResponseDto.fromEntity(savedPost);

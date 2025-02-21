@@ -8,10 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.HashMap;
+
 
 @Service
 public class StorageService {
-
     private final Cloudinary cloudinary;
 
     public StorageService(
@@ -24,11 +25,14 @@ public class StorageService {
                 "api_secret", apiSecret));
     }
 
-    public String store(MultipartFile file) {
+    public Map<String, String> store(MultipartFile file) {
         try {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
                     ObjectUtils.asMap("resource_type", "auto"));
-            return (String) uploadResult.get("secure_url");
+            Map<String, String> result = new HashMap<>();
+            result.put("url", (String) uploadResult.get("secure_url"));
+            result.put("mediaType", (String) uploadResult.get("resource_type")); // "image" or "video"
+            return result;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file to Cloudinary", e);
         }
@@ -44,7 +48,6 @@ public class StorageService {
     }
 
     private String extractPublicId(String fileUrl) {
-        // Example URL: https://res.cloudinary.com/dabc123/image/upload/v1234567890/filename.jpg
         String[] parts = fileUrl.split("/");
         String fileName = parts[parts.length - 1];
         return fileName.substring(0, fileName.lastIndexOf("."));

@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,6 +32,9 @@ public class PostController {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private PostRepository postRepository;
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponseDto> createPost(
             @RequestPart("post") String postJson,
@@ -41,11 +45,21 @@ public class PostController {
         PostCreateDto postDto = objectMapper.readValue(postJson, PostCreateDto.class);
 
         String imageUrl = null;
+        String mediaType = null;
         if (image != null && !image.isEmpty()) {
-            imageUrl = storageService.store(image);
+            Map<String, String> uploadResult = storageService.store(image);
+            imageUrl = uploadResult.get("url");
+            mediaType = uploadResult.get("mediaType");
         }
 
         PostResponseDto responseDto = postService.createPost(postDto, imageUrl);
+        if (mediaType != null) {
+            Post post = postService.getPostById(responseDto.getId());
+            post.setMediaType(mediaType);
+            postRepository.save(post);
+            responseDto.setMediaType(mediaType);
+        }
+
         return ResponseEntity.ok(responseDto);
     }
 

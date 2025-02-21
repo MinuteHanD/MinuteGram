@@ -56,62 +56,56 @@ const PostDetails = () => {
 
   return (
     <div className="min-h-screen bg-zinc-900">
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-zinc-400 hover:text-emerald-400 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Posts</span>
-        </button>
+        <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+            <button
+                onClick={() => navigate(-1)}
+                className="flex items-center space-x-2 text-zinc-400 hover:text-emerald-400 transition-colors"
+            >
+                <ArrowLeft className="w-5 h-5" />
+                <span>Back to Posts</span>
+            </button>
 
-        {/* Post Content */}
-        <article className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">
-          <div className="space-y-6">
-            <h1 className="text-4xl font-bold text-zinc-100">
-              {post.title}
-            </h1>
-            
-            {/* Author Info */}
-            <div className="flex items-center space-x-6 text-zinc-400">
-              <div className="flex items-center space-x-2">
-                <div className="bg-zinc-900/50 p-2 rounded-lg">
-                  <User className="w-4 h-4 text-emerald-400" />
+            <article className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">
+                <div className="space-y-6">
+                    <h1 className="text-4xl font-bold text-zinc-100">{post.title}</h1>
+                    <div className="flex items-center space-x-6 text-zinc-400">
+                        <div className="flex items-center space-x-2">
+                            <div className="bg-zinc-900/50 p-2 rounded-lg">
+                                <User className="w-4 h-4 text-emerald-400" />
+                            </div>
+                            <span className="font-medium">{post.authorName || 'Anonymous'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <div className="bg-zinc-900/50 p-2 rounded-lg">
+                                <Clock className="w-4 h-4 text-emerald-400" />
+                            </div>
+                            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    {post.imageUrl && (
+                        <div className="relative rounded-xl overflow-hidden bg-zinc-900/50">
+                            {post.mediaType === 'video' ? (
+                                <video controls src={post.imageUrl} className="w-full h-auto" />
+                            ) : (
+                                <img 
+                                    src={post.imageUrl} 
+                                    alt="Post content" 
+                                    className="w-full h-auto object-cover"
+                                    onError={(e) => {
+                                        console.error('Media failed to load:', post.imageUrl);
+                                        e.target.style.display = 'none';
+                                    }} 
+                                />
+                            )}
+                        </div>
+                    )}
+                    <div className="border-t border-zinc-700 pt-6">
+                        <p className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap">
+                            {post.content}
+                        </p>
+                    </div>
                 </div>
-                <span className="font-medium">{post.authorName || 'Anonymous'}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="bg-zinc-900/50 p-2 rounded-lg">
-                  <Clock className="w-4 h-4 text-emerald-400" />
-                </div>
-                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-            
-            {/* Image */}
-            {post.imageUrl && (
-              <div className="relative rounded-xl overflow-hidden bg-zinc-900/50">
-                <img 
-                  src={post.imageUrl} 
-                  alt="Post content" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    console.error('Image failed to load:', post.imageUrl);
-                    e.target.style.display = 'none';
-                  }} 
-                />
-              </div>
-            )}
-
-            {/* Content */}
-            <div className="border-t border-zinc-700 pt-6">
-              <p className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap">
-                {post.content}
-              </p>
-            </div>
-          </div>
-        </article>
+            </article>
 
         {/* Comments Section */}
         <section className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">

@@ -24,6 +24,9 @@ public class Post {
     @Column
     private String imageUrl;
 
+    @Column
+    private String mediaType;
+
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -106,6 +109,14 @@ public class Post {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 
 }

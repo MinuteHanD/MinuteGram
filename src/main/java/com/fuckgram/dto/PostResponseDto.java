@@ -11,6 +11,7 @@ public class PostResponseDto {
     private String authorName;
     private String topicName;
     private String imageUrl;
+    private String mediaType;
     private LocalDateTime createdAt;
 
 
@@ -22,6 +23,7 @@ public class PostResponseDto {
         dto.setAuthorName(post.getUser().getName());
         dto.setTopicName(post.getTopic().getName());
         dto.setImageUrl(post.getImageUrl());
+        dto.setMediaType(post.getMediaType());
         dto.setCreatedAt(post.getCreatedAt());
         return dto;
     }
@@ -81,5 +83,13 @@ public class PostResponseDto {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 }
