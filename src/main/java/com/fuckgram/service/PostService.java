@@ -52,7 +52,7 @@ public class PostService {
 
         User currentUser = userService.getCurrentUser();
 
-        String mediaType = null; // This will be set in the controller, not here
+        String mediaType = null;
         Post post = createPostEntity(postDto, imageUrl, mediaType, topic, currentUser);
         Post savedPost = postRepository.save(post);
 

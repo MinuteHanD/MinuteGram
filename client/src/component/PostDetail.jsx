@@ -3,13 +3,41 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
 import { MessageSquare, Send, User, Clock, ThumbsUp, ArrowLeft } from 'lucide-react';
 
+// Move reusable components outside the main component to avoid unnecessary re-renders
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-zinc-800/40 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-lg shadow-black/20 ${className}`}>
+    {children}
+  </div>
+);
+
+const Button = ({ children, variant = 'primary', className = '', ...props }) => {
+  const baseStyles = 'px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2';
+  const variants = {
+    primary: 'bg-emerald-600 hover:bg-emerald-500 text-zinc-100 shadow-emerald-900/20 shadow-lg hover:shadow-emerald-900/30 hover:shadow-xl',
+    secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
+    ghost: 'hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200'
+  };
+  
+  return (
+    <button className={`${baseStyles} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+// Memoized video player to avoid restarting video on unrelated re-renders
+const VideoPlayer = React.memo(({ src }) => (
+  <video controls src={src} className="w-full" />
+));
+
 const PostDetails = () => {
   const { postId } = useParams();
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
 
   const fetchPostDetails = async () => {
     try {
@@ -55,138 +83,105 @@ const PostDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900">
-        <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-            <button
-                onClick={() => navigate(-1)}
-                className="flex items-center space-x-2 text-zinc-400 hover:text-emerald-400 transition-colors"
-            >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Back to Posts</span>
-            </button>
+    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950">
+      <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+        <Button variant="ghost" onClick={() => navigate(-1)}>
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back</span>
+        </Button>
 
-            <article className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">
-                <div className="space-y-6">
-                    <h1 className="text-4xl font-bold text-zinc-100">{post.title}</h1>
-                    <div className="flex items-center space-x-6 text-zinc-400">
-                        <div className="flex items-center space-x-2">
-                            <div className="bg-zinc-900/50 p-2 rounded-lg">
-                                <User className="w-4 h-4 text-emerald-400" />
-                            </div>
-                            <span className="font-medium">{post.authorName || 'Anonymous'}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <div className="bg-zinc-900/50 p-2 rounded-lg">
-                                <Clock className="w-4 h-4 text-emerald-400" />
-                            </div>
-                            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                        </div>
-                    </div>
-                    {post.imageUrl && (
-                        <div className="relative rounded-xl overflow-hidden bg-zinc-900/50">
-                            {post.mediaType === 'video' ? (
-                                <video controls src={post.imageUrl} className="w-full h-auto" />
-                            ) : (
-                                <img 
-                                    src={post.imageUrl} 
-                                    alt="Post content" 
-                                    className="w-full h-auto object-cover"
-                                    onError={(e) => {
-                                        console.error('Media failed to load:', post.imageUrl);
-                                        e.target.style.display = 'none';
-                                    }} 
-                                />
-                            )}
-                        </div>
-                    )}
-                    <div className="border-t border-zinc-700 pt-6">
-                        <p className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap">
-                            {post.content}
-                        </p>
-                    </div>
+        <Card className="p-8 space-y-8">
+          <div className="space-y-6">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              {post.title}
+            </h1>
+            
+            <div className="flex flex-wrap gap-6 text-zinc-400 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-emerald-500/10">
+                  <User className="w-4 h-4 text-emerald-400" />
                 </div>
-            </article>
-
-        {/* Comments Section */}
-        <section className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 border border-zinc-700">
-          <div className="flex items-center space-x-4 mb-8">
-            <div className="bg-zinc-900/50 p-3 rounded-lg">
-              <MessageSquare className="w-6 h-6 text-emerald-400" />
+                <span>{post.authorName || 'Anonymous'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-emerald-500/10">
+                  <Clock className="w-4 h-4 text-emerald-400" />
+                </div>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              </div>
             </div>
-            <h2 className="text-2xl font-bold text-zinc-100">
-              Comments ({comments.length})
-            </h2>
-          </div>
 
-          {/* Comments List */}
-          {comments.length > 0 ? (
+            {post.imageUrl && (
+              <div className="relative rounded-2xl overflow-hidden bg-zinc-900">
+                {post.mediaType === 'video' ? (
+                  <VideoPlayer src={post.imageUrl} />
+                ) : (
+                  <img src={post.imageUrl} alt="" className="w-full object-cover" />
+                )}
+              </div>
+            )}
+
+            <div className="prose prose-invert max-w-none">
+              <p className="text-zinc-300 leading-relaxed">{post.content}</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-8">
+          <div className="space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-lg bg-emerald-500/10">
+                <MessageSquare className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-100">
+                Comments ({comments.length})
+              </h2>
+            </div>
+
             <div className="space-y-6">
-              {comments.map((comment) => (
-                <div 
-                  key={comment.id} 
-                  className="group bg-zinc-900/50 p-6 rounded-lg border border-zinc-700 hover:border-emerald-500/20 transition-all duration-200"
-                >
-                  <p className="text-zinc-300 mb-4 leading-relaxed">{comment.content}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3 text-zinc-400">
-                      <div className="bg-zinc-800 p-2 rounded-lg">
-                        <User className="w-4 h-4 text-emerald-400" />
-                      </div>
-                      <span className="font-medium">{comment.authorName}</span>
+              {comments.map(comment => (
+                <Card key={comment.id} className="p-6 hover:border-emerald-500/30 transition-colors">
+                  <p className="text-zinc-300 mb-4">{comment.content}</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-3 text-zinc-400">
+                      <User className="w-4 h-4 text-emerald-400" />
+                      <span>{comment.authorName}</span>
                       <span>•</span>
-                      <span className="text-sm">
-                        {new Date(comment.createdAt).toLocaleDateString()}
-                      </span>
+                      <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <ThumbsUp className="w-4 h-4 text-zinc-500 hover:text-emerald-400 transition-colors" />
-                    </button>
+                    <Button variant="ghost" className="opacity-0 group-hover:opacity-100">
+                      <ThumbsUp className="w-4 h-4" />
+                    </Button>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-12 space-y-4">
-              <div className="bg-zinc-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
-                <MessageSquare className="w-10 h-10 text-zinc-600" />
-              </div>
-              <p className="text-xl font-semibold text-zinc-300">No comments yet</p>
-              <p className="text-zinc-500">Be the first to share your thoughts</p>
-            </div>
-          )}
 
-          {/* Comment Form */}
-          {token ? (
-            <div className="mt-8 space-y-4">
-              <textarea
-                placeholder="Write your comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="w-full bg-zinc-900/50 text-zinc-100 px-6 py-4 rounded-lg border border-zinc-700 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 h-32 placeholder:text-zinc-600 resize-none"
-              />
-              <div className="flex justify-end">
-                <button 
-                  onClick={addComment} 
-                  className="bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
-                  disabled={!newComment.trim()}
-                >
-                  <Send className="w-5 h-5" />
-                  <span className="font-medium">Post Comment</span>
-                </button>
+            {token ? (
+              <div className="space-y-4">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Share your thoughts..."
+                  className="w-full bg-zinc-900/50 text-zinc-100 p-4 rounded-xl border border-zinc-700 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none h-32"
+                />
+                <div className="flex justify-end">
+                  <Button onClick={addComment} disabled={!newComment.trim()}>
+                    <Send className="w-5 h-5" />
+                    <span>Post Comment</span>
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="mt-8 bg-zinc-900/50 rounded-lg p-6 text-center">
-              <button 
-                onClick={() => navigate('/login')}
-                className="bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-8 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 mx-auto"
-              >
-                <MessageSquare className="w-5 h-5" />
-                <span className="font-medium">Login to Comment</span>
-              </button>
-            </div>
-          )}
-        </section>
+            ) : (
+              <div className="text-center p-8">
+                <Button onClick={() => navigate('/login')}>
+                  <MessageSquare className="w-5 h-5" />
+                  <span>Login to Comment</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   );
