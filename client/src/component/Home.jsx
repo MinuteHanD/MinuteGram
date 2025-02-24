@@ -205,7 +205,7 @@ const Home = () => {
                 <div className="absolute inset-4 bg-indigo-600 rounded-full opacity-40"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                 <img
-                  src="/public/Logo2.png"
+                  src="/Logo2.png"
                   alt="Custom Icon"
                   //className="w-20 h-20"
                 />

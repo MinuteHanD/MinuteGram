@@ -72,7 +72,7 @@ const Navbar = () => {
           >
             <div >
               <img
-                  src="/public/Logo2.png"
+                  src="/Logo2.png"
                   alt="Custom Icon"
                   className="w-12 h-12"
                 />
