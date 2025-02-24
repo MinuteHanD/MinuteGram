@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-dark-50 text-dark-400 font-sans;
+  @apply bg-zinc-950 text-dark-400 font-sans m-0 h-full w-full;
 }
 
 
@@ -16,4 +16,5 @@ body {
 ::-webkit-scrollbar-thumb {
   @apply bg-dark-300 rounded-full;
 }
+
 
