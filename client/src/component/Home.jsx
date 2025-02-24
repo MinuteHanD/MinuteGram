@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
-import { Shield, Plus, MessageSquare, X, Search, Settings, Bell, Users, Bookmark, TrendingUp } from 'lucide-react';
+import { Shield, Plus, MessageSquare, X, Search, Settings, Bell, Bookmark, TrendingUp } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 const Home = () => {
@@ -12,7 +12,6 @@ const Home = () => {
   const [newTopicDescription, setNewTopicDescription] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const [userRole, setUserRole] = useState(null);
@@ -69,13 +68,6 @@ const Home = () => {
     topic.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const categories = [
-    { id: 'all', name: 'All Topics', icon: MessageSquare },
-    { id: 'trending', name: 'Trending', icon: TrendingUp },
-    { id: 'your', name: 'Your Topics', icon: Bookmark },
-    { id: 'community', name: 'Community', icon: Users },
-  ];
-
   const renderTopicCard = (topic) => (
     <div
       key={topic.id}
@@ -93,7 +85,7 @@ const Home = () => {
                 {topic.name}
               </h3>
               <p className="text-sm text-gray-400">
-                Created by {topic.userName || 'Anonymous'}
+                Created by {topic.creatorName || 'Anonymous'}
               </p>
             </div>
           </div>
@@ -102,12 +94,8 @@ const Home = () => {
           </p>
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2 text-gray-400">
-              <Users className="w-4 h-4" />
-              <span>{topic.participantsCount || 0} participants</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-400">
               <MessageSquare className="w-4 h-4" />
-              <span>{topic.messagesCount || 0} messages</span>
+              <span>{topic.postCount || 0} posts</span>
             </div>
           </div>
         </div>
@@ -124,7 +112,7 @@ const Home = () => {
       <h3 className="text-2xl font-semibold text-gray-200 mb-3">No topics found</h3>
       <p className="text-gray-400 max-w-md mx-auto mb-8">
         {searchQuery 
-          ? 'Try adjusting your search terms or browse through different categories'
+          ? 'Try adjusting your search terms'
           : 'Be the first to create a topic and start the conversation'}
       </p>
       {token && (
@@ -157,26 +145,6 @@ const Home = () => {
             <p className="text-gray-400 max-w-2xl mx-auto">
               Cum Back soon.....
             </p>
-          </div>
-
-          {/* Category Navigation */}
-          <div className="mb-8">
-            <div className="flex items-center gap-4 overflow-x-auto pb-4">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    selectedCategory === category.id
-                      ? 'bg-emerald-500/20 text-emerald-400'
-                      : 'text-gray-400 hover:text-gray-200'
-                  }`}
-                >
-                  <category.icon className="w-4 h-4" />
-                  <span>{category.name}</span>
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Search and Actions */}
