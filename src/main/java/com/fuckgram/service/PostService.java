@@ -9,6 +9,7 @@ import com.fuckgram.exception.InvalidInputException;
 import com.fuckgram.exception.TopicNotFoundException;
 import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.TopicRepository;
+import com.fuckgram.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +23,18 @@ public class PostService {
     private final TopicRepository topicRepository;
     private final UserService userService;
     private final StorageService storageService;
+    private final UserRepository userRepository;
 
     public PostService(PostRepository postRepository,
                        TopicRepository topicRepository,
                        UserService userService,
-                       StorageService storageService) {
+                       StorageService storageService,
+                       UserRepository userRepository) {
         this.postRepository = postRepository;
         this.topicRepository = topicRepository;
         this.userService = userService;
         this.storageService = storageService;
+        this.userRepository = userRepository;
     }
 
     private Post createPostEntity(PostCreateDto postDto, String imageUrl, String mediaType, Topic topic, User currentUser) {
@@ -81,5 +85,29 @@ public class PostService {
             storageService.deleteFile(post.getImageUrl());
         }
         postRepository.delete(post);
+    }
+
+    public void likePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (post.getLikedByUsers().contains(user)) {
+            throw new RuntimeException("Already liked");
+        }
+        post.getLikedByUsers().add(user);
+        postRepository.save(post);
+    }
+
+    public void unlikePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!post.getLikedByUsers().contains(user)) {
+            throw new RuntimeException("Not liked yet");
+        }
+        post.getLikedByUsers().remove(user);
+        postRepository.save(post);
     }
 }

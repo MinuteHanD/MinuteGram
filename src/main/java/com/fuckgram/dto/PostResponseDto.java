@@ -13,6 +13,8 @@ public class PostResponseDto {
     private String imageUrl;
     private String mediaType;
     private LocalDateTime createdAt;
+    private int likesCount;
+    private int commentsCount;
 
 
     public static PostResponseDto fromEntity(Post post) {
@@ -25,6 +27,8 @@ public class PostResponseDto {
         dto.setImageUrl(post.getImageUrl());
         dto.setMediaType(post.getMediaType());
         dto.setCreatedAt(post.getCreatedAt());
+        dto.likesCount = post.getLikedByUsers().size();
+        dto.commentsCount = post.getComments().size();
         return dto;
     }
 
@@ -92,4 +96,9 @@ public class PostResponseDto {
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
+
+    public int getLikesCount() { return likesCount; }
+    public void setLikesCount(int likesCount) { this.likesCount = likesCount; }
+    public int getCommentsCount() { return commentsCount; }
+    public void setCommentsCount(int commentsCount) { this.commentsCount = commentsCount; }
 }

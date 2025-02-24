@@ -60,6 +60,12 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Topic> createdTopics = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "likedByUsers")
+    private Set<Post> likedPosts = new HashSet<>();
+
+    public Set<Post> getLikedPosts() { return likedPosts; }
+    public void setLikedPosts(Set<Post> likedPosts) { this.likedPosts = likedPosts; }
+
 
     public List<Topic> getCreatedTopics(){
         return createdTopics;

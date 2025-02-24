@@ -7,7 +7,7 @@ import {
   Image as ImageIcon, Link as LinkIcon, Clock
 } from 'lucide-react';
 
-// Reusable components with proper TypeScript-like prop definitions
+
 const Card = React.memo(({ children, className = '', ...props }) => (
   <div 
     className={`bg-zinc-800/40 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-lg shadow-black/20 ${className}`}
@@ -113,29 +113,29 @@ const PostCard = React.memo(({ post, onInteraction }) => {
           )}
         </p>
 
-        {post.mediaUrl && (
-          <div className="relative z-10 rounded-xl overflow-hidden border border-zinc-700 bg-zinc-900">
-            {post.mediaType?.startsWith('video/') ? (
-              <video 
-                controls 
-                src={post.mediaUrl} 
-                className="max-h-96 w-full object-cover"
-              />
-            ) : (
-              <img 
-                src={post.mediaUrl} 
-                alt={post.title} 
-                className="max-h-96 w-full object-cover"
-              />
-            )}
-          </div>
+        {post.imageUrl && (
+            <div className="relative rounded-xl overflow-hidden border border-zinc-700 bg-zinc-900">
+                {post.mediaType === 'video' ? (
+                    <video
+                        controls
+                        src={post.imageUrl}
+                        className="max-h-96 w-full object-cover"
+                    />
+                ) : (
+                    <img
+                        src={post.imageUrl}
+                        alt={post.title}
+                        className="max-h-96 w-full object-cover"
+                    />
+                )}
+            </div>
         )}
 
         <div className="flex items-center justify-between pt-4 border-t border-zinc-700/50">
           <div className="flex items-center gap-4">
             <IconButton
               icon={Heart}
-              label={post.likes?.toString() || '0'}
+              label={post.likesCount?.toString() || '0'}
               onClick={(e) => {
                 e.stopPropagation();
                 onInteraction('like', post.id);
@@ -143,7 +143,7 @@ const PostCard = React.memo(({ post, onInteraction }) => {
             />
             <IconButton
               icon={MessageCircle}
-              label={post.comments?.toString() || '0'}
+              label={post.commentsCount?.toString() || '0'}
               onClick={(e) => {
                 e.stopPropagation();
                 onInteraction('comment', post.id);
@@ -326,15 +326,7 @@ export const TopicPage = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-zinc-300"
-            >
-              <option value="newest">Newest</option>
-              <option value="popular">Most Popular</option>
-              <option value="discussed">Most Discussed</option>
-            </select>
+            
             
             {token && (
               <Button onClick={() => setShowForm(!showForm)}>
