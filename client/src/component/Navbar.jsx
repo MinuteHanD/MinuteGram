@@ -78,7 +78,7 @@ const Navbar = () => {
                 />
             </div>
             <span className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">
-              Minutegram
+              Home
             </span>
           </button>
 
