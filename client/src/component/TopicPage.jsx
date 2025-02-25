@@ -4,13 +4,13 @@ import api from '../service/apiClient';
 import { 
   MessageSquare, FileText, Plus, X, Upload, ChevronRight, 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, 
-  Image as ImageIcon, Link as LinkIcon, Clock
+  Image as ImageIcon, Link as LinkIcon, Clock, Users, TrendingUp
 } from 'lucide-react';
 
-
+// Shared components
 const Card = React.memo(({ children, className = '', ...props }) => (
   <div 
-    className={`bg-zinc-800/40 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-lg shadow-black/20 ${className}`}
+    className={`bg-zinc-900 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-lg shadow-black/20 ${className}`}
     {...props}
   >
     {children}
@@ -26,9 +26,9 @@ const Button = React.memo(({
   size = 'md',
   ...props 
 }) => {
-  const baseStyles = 'rounded-xl font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'rounded-lg font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
   const variants = {
-    primary: 'bg-emerald-600 hover:bg-emerald-500 text-zinc-100 disabled:hover:bg-emerald-600',
+    primary: 'bg-teal-600 hover:bg-teal-500 text-zinc-100 disabled:hover:bg-teal-600',
     secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
     ghost: 'hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200',
     danger: 'bg-red-600 hover:bg-red-500 text-zinc-100'
@@ -51,9 +51,9 @@ const Button = React.memo(({
   );
 });
 
-const IconButton = React.memo(({ icon: Icon, label, ...props }) => (
+const IconButton = React.memo(({ icon: Icon, label, active = false, ...props }) => (
   <button
-    className="p-2 rounded-lg hover:bg-zinc-700/50 text-zinc-400 hover:text-zinc-200 transition-all flex items-center gap-2"
+    className={`p-2 rounded-lg ${active ? 'bg-teal-600 text-white' : 'hover:bg-zinc-700/50 text-zinc-400 hover:text-zinc-200'} transition-all flex items-center gap-2`}
     {...props}
   >
     <Icon className="w-5 h-5" />
@@ -69,13 +69,13 @@ const PostCard = React.memo(({ post, onInteraction }) => {
 
   return (
     <Card 
-      className="p-6 hover:border-emerald-500/30 transition-all space-y-4 cursor-pointer"
+      className="p-6 hover:border-teal-500/30 transition-all space-y-4 cursor-pointer"
       onClick={() => navigate(`/posts/${post.id}`)}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <MessageSquare className="w-6 h-6 text-emerald-400" />
+          <div className="w-12 h-12 rounded-full bg-teal-500/10 flex items-center justify-center">
+            <MessageSquare className="w-6 h-6 text-teal-400" />
           </div>
           <div>
             <h3 className="text-xl font-semibold text-zinc-100">
@@ -106,7 +106,7 @@ const PostCard = React.memo(({ post, onInteraction }) => {
                 e.stopPropagation();
                 setIsExpanded(!isExpanded);
               }}
-              className="ml-2 text-emerald-400 hover:text-emerald-300 font-medium"
+              className="ml-2 text-teal-400 hover:text-teal-300 font-medium"
             >
               {isExpanded ? 'Show less' : 'Read more'}
             </button>
@@ -136,6 +136,7 @@ const PostCard = React.memo(({ post, onInteraction }) => {
             <IconButton
               icon={Heart}
               label={post.likesCount?.toString() || '0'}
+              active={post.liked}
               onClick={(e) => {
                 e.stopPropagation();
                 onInteraction('like', post.id);
@@ -159,6 +160,7 @@ const PostCard = React.memo(({ post, onInteraction }) => {
           </div>
           <IconButton
             icon={Bookmark}
+            active={post.bookmarked}
             onClick={(e) => {
               e.stopPropagation();
               onInteraction('bookmark', post.id);
@@ -187,6 +189,7 @@ export const TopicPage = () => {
   const [mediaPreview, setMediaPreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -212,6 +215,7 @@ export const TopicPage = () => {
   };
 
   const fetchPosts = async () => {
+    setIsLoading(true);
     try {
       const [topicResponse, postsResponse] = await Promise.all([
         api.get(`/topics/${topicId}`),
@@ -228,6 +232,8 @@ export const TopicPage = () => {
     } catch (err) {
       console.error('Failed to fetch posts:', err);
       alert('Failed to fetch posts');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -307,171 +313,248 @@ export const TopicPage = () => {
     };
   }, [topicId, sortBy]);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950">
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-emerald-500/10">
-              <FileText className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                {topicName}
-              </h1>
-              <p className="text-zinc-400 mt-1">
-                {posts.length} {posts.length === 1 ? 'post' : 'posts'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            
-            
-            {token && (
-              <Button onClick={() => setShowForm(!showForm)}>
-                <Plus className="w-5 h-5" />
-                <span>Create Post</span>
-              </Button>
-            )}
+  // Filter buttons for sorting
+  const filterButtons = [
+    { id: 'newest', label: 'Newest', icon: Clock },
+    { id: 'popular', label: 'Popular', icon: TrendingUp },
+    { id: 'discussed', label: 'Most Discussed', icon: MessageCircle },
+  ];
+
+  // Post skeleton for loading state
+  const renderPostSkeleton = () => (
+    <Card className="p-6 space-y-4">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-zinc-800 animate-pulse"></div>
+          <div>
+            <div className="h-6 w-48 bg-zinc-800 rounded animate-pulse mb-2"></div>
+            <div className="h-4 w-32 bg-zinc-800 rounded animate-pulse"></div>
           </div>
         </div>
+      </div>
+      <div className="space-y-3">
+        <div className="h-4 w-full bg-zinc-800 rounded animate-pulse"></div>
+        <div className="h-4 w-full bg-zinc-800 rounded animate-pulse"></div>
+        <div className="h-4 w-3/4 bg-zinc-800 rounded animate-pulse"></div>
+      </div>
+      <div className="pt-4 border-t border-zinc-700/50 flex justify-between">
+        <div className="flex gap-4">
+          <div className="h-8 w-16 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="h-8 w-16 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="h-8 w-10 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+        <div className="h-8 w-10 bg-zinc-800 rounded animate-pulse"></div>
+      </div>
+    </Card>
+  );
 
-        {showForm && (
-          <Card className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-zinc-100">New Post</h2>
+  return (
+    <div className="min-h-screen bg-zinc-950 relative">
+      {/* Subtle gradient overlay */}
+      <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5" />
+      
+      {/* Subtle dot pattern */}
+      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-10 bg-repeat" />
+      
+      <div className="relative pt-24 pb-12">
+        <div className="max-w-4xl mx-auto px-4 space-y-8">
+          {/* Topic Header */}
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-800 mb-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-600/10 to-emerald-600/10"></div>
+            <div className="relative z-10 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="p-4 rounded-lg bg-teal-500/10">
+                  <FileText className="w-8 h-8 text-teal-400" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-white">
+                    {topicName}
+                  </h1>
+                  <p className="text-zinc-400 mt-1 flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+                  </p>
+                </div>
+              </div>
+              
+              {token && (
                 <Button 
-                  variant="ghost" 
-                  onClick={() => {
-                    setShowForm(false);
-                    setFormData({ title: '', content: '' });
-                    if (mediaPreview) {
-                      URL.revokeObjectURL(mediaPreview);
-                      setMediaPreview(null);
-                    }
-                  }}
+                  onClick={() => setShowForm(!showForm)}
+                  className="self-start md:self-auto"
                 >
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="Post Title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="w-full bg-zinc-900/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                />
-                
-                <div className="relative">
-                  <textarea
-                    name="content"
-                    placeholder="Write your post..."
-                    value={formData.content}
-                    onChange={handleInputChange}
-                    rows={6}
-                    className="w-full bg-zinc-900/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
-                  />
-                  <div className="absolute bottom-3 right-3 text-sm text-zinc-500">
-                    {formData.content.length} / 2000
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 border-t border-zinc-700/50 pt-4">
-                  <Button type="button" variant="secondary" onClick={openFilePicker}>
-                    <ImageIcon className="w-5 h-5" />
-                    <span>Add Media</span>
-                  </Button>
-                  
-                  
-                </div>
-
-                {mediaPreview && (
-                  <div className="relative z-10 rounded-xl overflow-hidden border border-zinc-700 bg-zinc-900">
-                    {mediaFile?.type.startsWith('video/') ? (
-                      <video 
-                        controls 
-                        src={mediaPreview} 
-                        className="w-full h-auto max-h-[400px] object-cover"
-                        preload="metadata"
-                      />
-                    ) : (
-                      <img 
-                        src={mediaPreview} 
-                        alt="Preview" 
-                        className="w-full h-auto max-h-[400px] object-cover"
-                        loading="lazy"
-                      />
-                    )}
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        URL.revokeObjectURL(mediaPreview);
-                        setMediaPreview(null);
-                        setMediaFile(null);
-                      }}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-
-                <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    disabled={!formData.title.trim() || !formData.content.trim() || isSubmitting}
-                  >
-                    {isSubmitting ? 'Publishing...' : 'Publish Post'}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </Card>
-        )}
-
-        <div className="space-y-6">
-          {/* Hidden file input */}
-          <input
-            type="file"
-            accept="image/*,video/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            className="hidden"
-          />
-
-          {posts.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onInteraction={handlePostInteraction}
-            />
-          ))}
-
-          {!posts.length && (
-            <Card className="py-20 text-center">
-              <MessageSquare className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-zinc-300 mb-2">No posts yet</h3>
-              <p className="text-zinc-500">
-                {token ? 'Start a discussion by creating the first post' : 'Sign in to start a discussion'}
-              </p>
-              {!token && (
-                <Button
-                  variant="secondary"
-                  className="mt-4"
-                  onClick={() => navigate('/login')}
-                >
-                  Sign In
+                  <Plus className="w-5 h-5" />
+                  <span>Create Post</span>
                 </Button>
               )}
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex items-center p-1 bg-zinc-900 border border-zinc-800 rounded-lg">
+              {filterButtons.map((filter) => {
+                const Icon = filter.icon;
+                return (
+                  <button
+                    key={filter.id}
+                    onClick={() => setSortBy(filter.id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                      sortBy === filter.id
+                        ? 'bg-teal-600 text-white'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{filter.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Create Post Form */}
+          {showForm && (
+            <Card className="p-6 mb-8 border-teal-500/20">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-zinc-100">New Post</h2>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => {
+                      setShowForm(false);
+                      setFormData({ title: '', content: '' });
+                      if (mediaPreview) {
+                        URL.revokeObjectURL(mediaPreview);
+                        setMediaPreview(null);
+                      }
+                    }}
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="Post Title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all"
+                  />
+                  
+                  <div className="relative">
+                    <textarea
+                      name="content"
+                      placeholder="Write your post..."
+                      value={formData.content}
+                      onChange={handleInputChange}
+                      rows={6}
+                      className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all resize-none"
+                    />
+                    <div className="absolute bottom-3 right-3 text-sm text-zinc-500">
+                      {formData.content.length} / 2000
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 border-t border-zinc-700/50 pt-4">
+                    <Button type="button" variant="secondary" onClick={openFilePicker}>
+                      <ImageIcon className="w-5 h-5" />
+                      <span>Add Media</span>
+                    </Button>
+                  </div>
+
+                  {mediaPreview && (
+                    <div className="relative z-10 rounded-xl overflow-hidden border border-zinc-700 bg-zinc-900">
+                      {mediaFile?.type.startsWith('video/') ? (
+                        <video 
+                          controls 
+                          src={mediaPreview} 
+                          className="w-full h-auto max-h-96 object-cover"
+                          preload="metadata"
+                        />
+                      ) : (
+                        <img 
+                          src={mediaPreview} 
+                          alt="Preview" 
+                          className="w-full h-auto max-h-96 object-cover"
+                          loading="lazy"
+                        />
+                      )}
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          URL.revokeObjectURL(mediaPreview);
+                          setMediaPreview(null);
+                          setMediaFile(null);
+                        }}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      disabled={!formData.title.trim() || !formData.content.trim() || isSubmitting}
+                    >
+                      {isSubmitting ? 'Publishing...' : 'Publish Post'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
             </Card>
           )}
+
+          {/* Posts */}
+          <div className="space-y-6">
+            {/* Hidden file input */}
+            <input
+              type="file"
+              accept="image/*,video/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              className="hidden"
+            />
+
+            {isLoading ? (
+              Array(3).fill(0).map((_, index) => (
+                <div key={`skeleton-${index}`} className="animate-pulse">
+                  {renderPostSkeleton()}
+                </div>
+              ))
+            ) : posts.length > 0 ? (
+              posts.map(post => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onInteraction={handlePostInteraction}
+                />
+              ))
+            ) : (
+              <Card className="py-16 text-center">
+                <div className="bg-teal-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <MessageSquare className="w-8 h-8 text-teal-400" />
+                </div>
+                <h3 className="text-2xl font-semibold text-zinc-100 mb-3">No posts yet</h3>
+                <p className="text-zinc-400 max-w-md mx-auto mb-8">
+                  {token ? 'Start a discussion by creating the first post' : 'Sign in to start a discussion'}
+                </p>
+                {!token && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => navigate('/login')}
+                  >
+                    Sign In
+                  </Button>
+                )}
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </div>

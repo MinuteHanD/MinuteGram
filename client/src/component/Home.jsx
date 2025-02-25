@@ -75,15 +75,15 @@ const Home = () => {
       onClick={() => navigate(`/topics/${topic.id}`)}
       className="group cursor-pointer"
     >
-      <div className="bg-zinc-900 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10 border border-zinc-800 hover:border-indigo-500/30">
+      <div className="bg-zinc-900 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/10 border border-zinc-800 hover:border-teal-500/30">
         <div className="p-5">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="bg-indigo-500/10 p-2 rounded">
-                <MessageSquare className="w-5 h-5 text-indigo-400" />
+              <div className="bg-teal-500/10 p-2 rounded">
+                <MessageSquare className="w-5 h-5 text-teal-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition-colors">
+                <h3 className="text-lg font-semibold text-white group-hover:text-teal-400 transition-colors">
                   {topic.name}
                 </h3>
                 <p className="text-xs text-zinc-500 flex items-center">
@@ -92,7 +92,7 @@ const Home = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-zinc-800 px-2 py-1 rounded text-xs font-medium text-indigo-300">
+            <div className="bg-zinc-800 px-2 py-1 rounded text-xs font-medium text-teal-300">
               {topic.postCount || 0} posts
             </div>
           </div>
@@ -106,7 +106,7 @@ const Home = () => {
                 {new Date().toLocaleDateString()}
               </span>
             </div>
-            <span className="text-indigo-400 flex items-center group-hover:underline">
+            <span className="text-teal-400 flex items-center group-hover:underline">
               View topic <ChevronRight className="w-3 h-3 ml-1" />
             </span>
           </div>
@@ -117,8 +117,8 @@ const Home = () => {
 
   const renderEmptyState = () => (
     <div className="text-center py-16 bg-zinc-900 rounded-lg border border-zinc-800">
-      <div className="bg-indigo-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-        <MessageSquare className="w-8 h-8 text-indigo-400" />
+      <div className="bg-teal-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+        <MessageSquare className="w-8 h-8 text-teal-400" />
       </div>
       <h3 className="text-2xl font-semibold text-white mb-3">No topics found</h3>
       <p className="text-zinc-400 max-w-md mx-auto mb-8">
@@ -129,7 +129,7 @@ const Home = () => {
       {token && (
         <button
           onClick={() => setShowForm(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"
+          className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           <span>Create New Topic</span>
@@ -165,7 +165,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-zinc-950">
       {/* Subtle gradient overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-indigo-900/5 via-zinc-900/5 to-zinc-900/5" />
+      <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5" />
       
       {/* Subtle dot pattern */}
       <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-10 bg-repeat" />
@@ -174,11 +174,11 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section */}
           <div className="mb-12 relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-800">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-600/10"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-600/10 to-emerald-600/10"></div>
             <div className="relative z-10 p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between">
               <div className="mb-6 lg:mb-0 lg:mr-8 text-left max-w-xl">
                 <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
-                  Welcome to <span className="text-indigo-400">Minutegram</span>
+                  Welcome to <span className="text-teal-400">Minutegram</span>
                 </h1>
                 <p className="text-zinc-400 text-lg mb-6">
                   Desperate need for a job -- Amritanshu
@@ -187,7 +187,7 @@ const Home = () => {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button 
                       onClick={() => navigate('/signup')}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                      className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-3 rounded-lg transition-colors font-medium"
                     >
                       Join the community
                     </button>
@@ -201,8 +201,8 @@ const Home = () => {
                 )}
               </div>
               <div className="hidden lg:block w-64 h-64 relative">
-                <div className="absolute inset-0 bg-indigo-500 rounded-full opacity-20 animate-pulse"></div>
-                <div className="absolute inset-4 bg-indigo-600 rounded-full opacity-40"></div>
+                <div className="absolute inset-0 bg-teal-500 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute inset-4 bg-teal-600 rounded-full opacity-40"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                 <img
                   src="/Logo2.png"
@@ -224,7 +224,7 @@ const Home = () => {
                   placeholder="Search topics..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 rounded-lg border border-zinc-800 focus:outline-none focus:border-indigo-500 text-white placeholder-zinc-500"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 rounded-lg border border-zinc-800 focus:outline-none focus:border-teal-500 text-white placeholder-zinc-500"
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -237,7 +237,7 @@ const Home = () => {
                         onClick={() => setActiveFilter(filter.id)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
                           activeFilter === filter.id
-                            ? 'bg-indigo-600 text-white'
+                            ? 'bg-teal-600 text-white'
                             : 'text-zinc-400 hover:text-white'
                         }`}
                       >
@@ -250,7 +250,7 @@ const Home = () => {
                 {token && (
                   <button 
                     onClick={() => setShowForm(true)}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white h-full px-4 py-2.5 rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                    className="bg-teal-600 hover:bg-teal-500 text-white h-full px-4 py-2.5 rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
                   >
                     <Plus className="w-5 h-5" />
                     <span className="hidden sm:inline">New Topic</span>
@@ -301,7 +301,7 @@ const Home = () => {
                   type="text"
                   value={newTopicName}
                   onChange={(e) => setNewTopicName(e.target.value)}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500"
                   placeholder="Enter topic name"
                 />
               </div>
@@ -312,7 +312,7 @@ const Home = () => {
                 <textarea
                   value={newTopicDescription}
                   onChange={(e) => setNewTopicDescription(e.target.value)}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 resize-none h-32"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 resize-none h-32"
                   placeholder="Enter topic description"
                 />
               </div>
@@ -326,7 +326,7 @@ const Home = () => {
                 <button
                   onClick={createTopic}
                   disabled={!newTopicName.trim()}
-                  className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg transition-colors font-medium"
+                  className="bg-teal-600 hover:bg-teal-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg transition-colors font-medium"
                 >
                   Create Topic
                 </button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Code, User, Settings, LogOut, LogIn, UserPlus, Shield, Bell, Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 const Navbar = () => {
@@ -32,7 +32,7 @@ const Navbar = () => {
       return (
         <button
           onClick={() => navigate('/admin')}
-          className="flex items-center space-x-2 text-red-400 hover:bg-zinc-800 w-full px-4 py-2 transition-colors rounded-lg"
+          className="flex items-center space-x-2 text-teal-400 hover:bg-zinc-800 w-full px-4 py-2 transition-colors rounded-lg"
         >
           <Shield className="w-4 h-4" />
           <span>Admin Dashboard</span>
@@ -44,7 +44,7 @@ const Navbar = () => {
       return (
         <button
           onClick={() => navigate('/moderation')}
-          className="flex items-center space-x-2 text-blue-400 hover:bg-zinc-800 w-full px-4 py-2 transition-colors rounded-lg"
+          className="flex items-center space-x-2 text-teal-400 hover:bg-zinc-800 w-full px-4 py-2 transition-colors rounded-lg"
         >
           <Shield className="w-4 h-4" />
           <span>Mod Dashboard</span>
@@ -70,21 +70,21 @@ const Navbar = () => {
             onClick={() => navigate('/')}
             className="flex items-center space-x-3 group"
           >
-            <div >
+            <div>
               <img
-                  src="/Logo2.png"
-                  alt="Custom Icon"
-                  className="w-12 h-12"
-                />
+                src="/Logo2.png"
+                alt="Custom Icon"
+                className="w-12 h-12"
+              />
             </div>
-            <span className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">
+            <span className="text-lg font-bold text-white group-hover:text-teal-400 transition-colors">
               Home
             </span>
           </button>
 
           {/* Mobile menu button */}
           <button 
-            className="lg:hidden text-white hover:text-indigo-400"
+            className="lg:hidden text-white hover:text-teal-400"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -95,8 +95,8 @@ const Navbar = () => {
             {token && (
               <>
                 <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors relative group">
-                  <Bell className="h-5 w-5 text-zinc-400 group-hover:text-indigo-400" />
-                  <span className="absolute top-0 right-0 w-2 h-2 bg-indigo-500 rounded-full transform transition-transform group-hover:scale-125" />
+                  <Bell className="h-5 w-5 text-zinc-400 group-hover:text-teal-400" />
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-teal-500 rounded-full transform transition-transform group-hover:scale-125" />
                 </button>
                 
                 <div className="h-6 w-px bg-zinc-800" />
@@ -109,7 +109,7 @@ const Navbar = () => {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="bg-zinc-800 hover:bg-zinc-700 rounded-lg px-4 py-2 transition-all duration-200 flex items-center space-x-2"
                 >
-                  <div className="h-7 w-7 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <div className="h-7 w-7 bg-teal-600 rounded-full flex items-center justify-center">
                     <span className="text-sm font-medium text-white">
                       {user?.name?.charAt(0) || 'U'}
                     </span>
@@ -128,7 +128,7 @@ const Navbar = () => {
                       }}
                       className="flex items-center w-full px-4 py-2 text-zinc-300 hover:bg-zinc-800 transition-colors"
                     >
-                      <User className="w-4 h-4 mr-2 text-indigo-400" />
+                      <User className="w-4 h-4 mr-2 text-teal-400" />
                       Profile
                     </button>
                     
@@ -139,7 +139,7 @@ const Navbar = () => {
                       }}
                       className="flex items-center w-full px-4 py-2 text-zinc-300 hover:bg-zinc-800 transition-colors"
                     >
-                      <Settings className="w-4 h-4 mr-2 text-zinc-400" />
+                      <Settings className="w-4 h-4 mr-2 text-teal-400" />
                       Settings
                     </button>
                     
@@ -166,7 +166,7 @@ const Navbar = () => {
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                  className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
                 >
                   <UserPlus className="w-4 h-4" />
                   <span>Sign Up</span>
@@ -183,7 +183,7 @@ const Navbar = () => {
           {token ? (
             <>
               <div className="flex items-center space-x-3 px-2 py-3 border-b border-zinc-800">
-                <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                <div className="h-8 w-8 bg-teal-600 rounded-full flex items-center justify-center">
                   <span className="text-sm font-medium text-white">
                     {user?.name?.charAt(0) || 'U'}
                   </span>
@@ -200,7 +200,7 @@ const Navbar = () => {
                 }}
                 className="flex items-center w-full px-4 py-2 text-zinc-300 hover:bg-zinc-800 transition-colors rounded-lg"
               >
-                <User className="w-4 h-4 mr-2 text-indigo-400" />
+                <User className="w-4 h-4 mr-2 text-teal-400" />
                 Profile
               </button>
               
@@ -211,7 +211,7 @@ const Navbar = () => {
                 }}
                 className="flex items-center w-full px-4 py-2 text-zinc-300 hover:bg-zinc-800 transition-colors rounded-lg"
               >
-                <Settings className="w-4 h-4 mr-2 text-zinc-400" />
+                <Settings className="w-4 h-4 mr-2 text-teal-400" />
                 Settings
               </button>
               
@@ -240,7 +240,7 @@ const Navbar = () => {
                   navigate('/signup');
                   setMobileMenuOpen(false);
                 }}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-2"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Sign Up</span>

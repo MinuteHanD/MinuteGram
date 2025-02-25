@@ -1,34 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
-import { MessageSquare, Send, User, Clock, ThumbsUp, ArrowLeft } from 'lucide-react';
-
-// Move reusable components outside the main component to avoid unnecessary re-renders
-const Card = ({ children, className = '' }) => (
-  <div className={`bg-zinc-800/40 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-lg shadow-black/20 ${className}`}>
-    {children}
-  </div>
-);
-
-const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-  const baseStyles = 'px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2';
-  const variants = {
-    primary: 'bg-emerald-600 hover:bg-emerald-500 text-zinc-100 shadow-emerald-900/20 shadow-lg hover:shadow-emerald-900/30 hover:shadow-xl',
-    secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
-    ghost: 'hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200'
-  };
-  
-  return (
-    <button className={`${baseStyles} ${variants[variant]} ${className}`} {...props}>
-      {children}
-    </button>
-  );
-};
-
-// Memoized video player to avoid restarting video on unrelated re-renders
-const VideoPlayer = React.memo(({ src }) => (
-  <video controls src={src} className="w-full" />
-));
+import { 
+  MessageSquare, 
+  Send, 
+  User, 
+  Clock, 
+  ThumbsUp, 
+  ArrowLeft, 
+  Share2, 
+  Bookmark, 
+  MoreHorizontal,
+  ChevronUp
+} from 'lucide-react';
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -38,6 +22,7 @@ const PostDetails = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [scrollToTop, setScrollToTop] = useState(false);
 
   const fetchPostDetails = async () => {
     try {
@@ -60,21 +45,57 @@ const PostDetails = () => {
     }
   };
 
+  const handleLike = async () => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/posts/${postId}/like`);
+      fetchPostDetails();
+    } catch (err) {
+      alert('Failed to like post');
+    }
+  };
+
   useEffect(() => {
     fetchPostDetails();
+
+    // Scroll position detection
+    const handleScroll = () => {
+      if (window.scrollY > 500) {
+        setScrollToTop(true);
+      } else {
+        setScrollToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [postId]);
+
+  // Scroll to top function
+  const scrollUp = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
-        <div className="w-full max-w-5xl mx-4">
-          <div className="bg-zinc-800/50 backdrop-blur-lg rounded-xl p-8 animate-pulse space-y-4">
-            <div className="h-8 w-2/3 bg-zinc-700 rounded-lg" />
-            <div className="h-4 w-1/4 bg-zinc-700 rounded-lg" />
-            <div className="space-y-2">
-              <div className="h-4 w-full bg-zinc-700 rounded-lg" />
-              <div className="h-4 w-full bg-zinc-700 rounded-lg" />
-              <div className="h-4 w-2/3 bg-zinc-700 rounded-lg" />
+      <div className="min-h-screen bg-zinc-950">
+        <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5" />
+        <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-10 bg-repeat" />
+        <div className="relative py-24">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="space-y-6">
+              {/* Skeleton loaders */}
+              <div className="h-10 w-2/3 bg-zinc-800 rounded-lg animate-pulse" />
+              <div className="h-6 w-1/3 bg-zinc-800 rounded-lg animate-pulse" />
+              <div className="h-96 bg-zinc-800 rounded-xl animate-pulse" />
+              <div className="space-y-4">
+                <div className="h-4 w-full bg-zinc-800 rounded animate-pulse" />
+                <div className="h-4 w-full bg-zinc-800 rounded animate-pulse" />
+                <div className="h-4 w-3/4 bg-zinc-800 rounded animate-pulse" />
+              </div>
             </div>
           </div>
         </div>
@@ -83,106 +104,230 @@ const PostDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950">
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
-        <Button variant="ghost" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
-        </Button>
+    <div className="min-h-screen bg-zinc-950">
+      {/* Background effects from Home page */}
+      <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5" />
+      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-10 bg-repeat" />
+      
+      {/* Main content */}
+      <div className="relative py-24">
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Back button */}
+          <button 
+            onClick={() => navigate(-1)}
+            className="mb-8 flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors group"
+          >
+            <div className="p-2 bg-zinc-900 rounded-full group-hover:bg-teal-500/10 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            <span>Back to topics</span>
+          </button>
 
-        <Card className="p-8 space-y-8">
-          <div className="space-y-6">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              {post.title}
-            </h1>
-            
-            <div className="flex flex-wrap gap-6 text-zinc-400 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-emerald-500/10">
-                  <User className="w-4 h-4 text-emerald-400" />
+          {/* Post content */}
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden mb-8">
+            {/* Post header */}
+            <div className="p-6 md:p-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                {post.title}
+              </h1>
+              
+              <div className="flex flex-wrap items-center gap-5 mb-6">
+                {/* Author info */}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center">
+                    <User className="w-5 h-5 text-teal-400" />
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">
+                      {post.authorName || 'Anonymous'}
+                    </div>
+                    <div className="text-xs text-zinc-500">
+                      Author
+                    </div>
+                  </div>
                 </div>
-                <span>{post.authorName || 'Anonymous'}</span>
+                
+                {/* Date & time */}
+                <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                  <Clock className="w-4 h-4 text-teal-400" />
+                  <span>
+                    {new Date(post.createdAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-emerald-500/10">
-                  <Clock className="w-4 h-4 text-emerald-400" />
+
+              {/* Media content (if any) */}
+              {post.imageUrl && (
+                <div className="rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800 mb-6">
+                  {post.mediaType === 'video' ? (
+                    <video
+                      controls
+                      src={post.imageUrl}
+                      className="w-full max-h-[500px] object-contain"
+                    />
+                  ) : (
+                    <img
+                      src={post.imageUrl}
+                      alt={post.title}
+                      className="w-full max-h-[500px] object-contain"
+                    />
+                  )}
                 </div>
-                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              )}
+
+              {/* Post content */}
+              <div className="text-zinc-300 leading-relaxed whitespace-pre-line">
+                {post.content}
+              </div>
+              
+              {/* Action buttons */}
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-zinc-800">
+                <div className="flex items-center gap-4">
+                  <button 
+                    className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors"
+                    onClick={handleLike}
+                  >
+                    <ThumbsUp className={`w-5 h-5 ${post.liked ? 'fill-teal-400 text-teal-400' : ''}`} />
+                    <span className="text-sm">{post.likesCount || 0}</span>
+                  </button>
+                  <button className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors">
+                    <MessageSquare className="w-5 h-5" />
+                    <span className="text-sm">{comments.length} Comments</span>
+                  </button>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors">
+                    <Share2 className="w-5 h-5" />
+                    <span className="text-sm hidden sm:inline">Share</span>
+                  </button>
+                  <button className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors">
+                    <Bookmark className="w-5 h-5" />
+                    <span className="text-sm hidden sm:inline">Save</span>
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
 
-            {post.imageUrl && (
-              <div className="relative rounded-2xl overflow-hidden bg-zinc-900">
-                {post.mediaType === 'video' ? (
-                  <VideoPlayer src={post.imageUrl} />
+          {/* Comments section */}
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="bg-teal-500/10 p-2 rounded">
+                  <MessageSquare className="w-5 h-5 text-teal-400" />
+                </div>
+                <h2 className="text-xl font-semibold text-white">
+                  Comments ({comments.length})
+                </h2>
+              </div>
+
+              {/* Comment form */}
+              {token ? (
+                <div className="mb-8">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-teal-500/20 flex-shrink-0 flex items-center justify-center">
+                      <User className="w-5 h-5 text-teal-400" />
+                    </div>
+                    <div className="flex-1">
+                      <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Write a comment..."
+                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-white resize-none focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors min-h-[120px]"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      onClick={addComment}
+                      disabled={!newComment.trim()}
+                      className="bg-teal-600 hover:bg-teal-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>Post Comment</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-6 mb-8 text-center">
+                  <p className="text-zinc-400 mb-4">Login to join the conversation</p>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Comments list */}
+              <div className="space-y-6">
+                {comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <div key={comment.id} className="border-b border-zinc-800 pb-6 last:border-b-0 last:pb-0">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-teal-500/10 flex-shrink-0 flex items-center justify-center">
+                          <User className="w-5 h-5 text-teal-400" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">
+                              {comment.authorName || 'Anonymous'}
+                            </span>
+                            <span className="text-xs text-zinc-500">•</span>
+                            <span className="text-xs text-zinc-500">
+                              {new Date(comment.createdAt).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                          <p className="text-zinc-300">{comment.content}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                            <button className="text-xs text-zinc-500 hover:text-teal-400 transition-colors">
+                              Like
+                            </button>
+                            <button className="text-xs text-zinc-500 hover:text-teal-400 transition-colors">
+                              Reply
+                            </button>
+                          </div>
+                        </div>
+                        <button className="text-zinc-500 hover:text-white p-1">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
                 ) : (
-                  <img src={post.imageUrl} alt="" className="w-full object-cover" />
+                  <div className="text-center py-12">
+                    <div className="bg-teal-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-white mb-2">No comments yet</h3>
+                    <p className="text-zinc-400">Be the first to share your thoughts</p>
+                  </div>
                 )}
               </div>
-            )}
-
-            <div className="prose prose-invert max-w-none">
-              <p className="text-zinc-300 leading-relaxed">{post.content}</p>
             </div>
           </div>
-        </Card>
-
-        <Card className="p-8">
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-emerald-500/10">
-                <MessageSquare className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h2 className="text-2xl font-bold text-zinc-100">
-                Comments ({comments.length})
-              </h2>
-            </div>
-
-            <div className="space-y-6">
-              {comments.map(comment => (
-                <Card key={comment.id} className="p-6 hover:border-emerald-500/30 transition-colors">
-                  <p className="text-zinc-300 mb-4">{comment.content}</p>
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-3 text-zinc-400">
-                      <User className="w-4 h-4 text-emerald-400" />
-                      <span>{comment.authorName}</span>
-                      <span>•</span>
-                      <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <Button variant="ghost" className="opacity-0 group-hover:opacity-100">
-                      <ThumbsUp className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {token ? (
-              <div className="space-y-4">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Share your thoughts..."
-                  className="w-full bg-zinc-900/50 text-zinc-100 p-4 rounded-xl border border-zinc-700 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none h-32"
-                />
-                <div className="flex justify-end">
-                  <Button onClick={addComment} disabled={!newComment.trim()}>
-                    <Send className="w-5 h-5" />
-                    <span>Post Comment</span>
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center p-8">
-                <Button onClick={() => navigate('/login')}>
-                  <MessageSquare className="w-5 h-5" />
-                  <span>Login to Comment</span>
-                </Button>
-              </div>
-            )}
-          </div>
-        </Card>
+        </div>
       </div>
+
+      {/* Scroll to top button */}
+      {scrollToTop && (
+        <button
+          onClick={scrollUp}
+          className="fixed bottom-8 right-8 bg-zinc-800/80 hover:bg-teal-600 border border-zinc-700 rounded-full p-3 text-white shadow-lg transition-colors backdrop-blur-sm"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 };

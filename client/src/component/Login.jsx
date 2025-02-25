@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../service/apiClient';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, Mail, Lock, Hexagon } from 'lucide-react';
+import { LogIn, Mail, Lock, Hexagon, ArrowLeft, AlertCircle } from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -54,80 +54,125 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-4">
-      {/* Logo Header */}
-      <div className="mb-8 flex items-center space-x-3">
-        <div className="bg-zinc-800/50 p-2 rounded-lg">
-          <Hexagon className="w-6 h-6 text-emerald-400" />
+    <div className="min-h-screen bg-zinc-950 flex flex-col md:flex-row">
+      {/* Left Panel - Branding */}
+      <div className="md:w-1/2 bg-gradient-to-br from-zinc-900 to-zinc-800 border-r border-zinc-800 p-8 flex flex-col">
+        <div className="flex items-center space-x-3 mb-12">
+          <div className="bg-teal-500/10 p-2 rounded-lg">
+            <Hexagon className="w-6 h-6 text-teal-400" />
+          </div>
+          <span className="text-xl font-bold text-white">MinuteGram</span>
         </div>
-        <span className="text-xl font-bold text-zinc-100">
-          MinuteGram
-        </span>
-      </div>
-
-      {/* Main Card */}
-      <div className="w-full max-w-md bg-zinc-800/50 backdrop-blur-lg border border-zinc-700 rounded-lg p-6 space-y-6">
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-zinc-100">
-            Welcome back
-          </h2>
-          <p className="text-zinc-400">
-            Sign in to your account
+        
+        <div className="flex-grow flex flex-col justify-center max-w-md mx-auto">
+          <h1 className="text-4xl font-bold text-white mb-6">
+            Welcome<br />
+            <span className="text-teal-400">back</span>
+          </h1>
+          <p className="text-zinc-400 text-lg mb-8">
+            Sign in to your account to continue your discussions and engage with the community.
           </p>
+          
+          <div className="bg-zinc-800/30 border border-zinc-700 rounded-lg p-6 mb-8">
+            <div className="flex items-start space-x-4">
+              <div className="bg-teal-500/10 p-2 rounded-full mt-1">
+                <LogIn className="w-5 h-5 text-teal-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-medium mb-2">Secure access</h3>
+                <p className="text-zinc-400 text-sm">Your data is encrypted and never shared with third parties.</p>
+              </div>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => navigate('/')}
+            className="text-zinc-400 hover:text-teal-400 transition-colors flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to home</span>
+          </button>
         </div>
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-2 rounded-lg">
-            {error}
+      </div>
+      
+      {/* Right Panel - Form */}
+      <div className="md:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">Sign in</h2>
+            <p className="text-zinc-400">
+              Don't have an account?{' '}
+              <button 
+                onClick={() => navigate('/signup')}
+                className="text-teal-400 hover:text-teal-300 transition-colors font-medium"
+              >
+                Create account
+              </button>
+            </p>
           </div>
-        )}
+          
+          {error && (
+            <div className="mb-6 bg-red-900/20 border border-red-800/30 rounded-lg p-4 flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+          
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full bg-zinc-900 text-white pl-10 pr-4 py-3 rounded-lg border border-zinc-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none transition-all placeholder:text-zinc-500"
+                    required
+                  />
+                </div>
+              </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-4">
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full bg-zinc-900/50 text-zinc-100 pl-10 pr-4 py-2 rounded-lg border border-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-500"
-                required
-              />
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-zinc-300">Password</label>
+                  <button type="button" className="text-xs text-teal-400 hover:text-teal-300">
+                    Forgot password?
+                  </button>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full bg-zinc-900 text-white pl-10 pr-4 py-3 rounded-lg border border-zinc-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:outline-none transition-all placeholder:text-zinc-500"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full bg-zinc-900/50 text-zinc-100 pl-10 pr-4 py-2 rounded-lg border border-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-500"
-                required
-              />
-            </div>
+            <button 
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-teal-600 hover:bg-teal-500 text-white px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              <LogIn className="w-5 h-5" />
+              <span>{isLoading ? 'Signing in...' : 'Sign in'}</span>
+            </button>
+          </form>
+          
+          <div className="mt-8 text-center">
+            <p className="text-zinc-500 text-sm">
+              By signing in, you agree to our Terms of Service and Privacy Policy
+            </p>
           </div>
-
-          <button 
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-zinc-100 px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <LogIn className="w-5 h-5" />
-            <span>{isLoading ? 'Signing in...' : 'Sign in'}</span>
-          </button>
-        </form>
-
-        <div className="text-center">
-          <button 
-            onClick={() => navigate('/signup')}
-            className="text-zinc-400 hover:text-emerald-400 transition-colors"
-          >
-            Need an account? Sign up
-          </button>
         </div>
       </div>
     </div>
