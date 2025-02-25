@@ -59,6 +59,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll();
+                    auth.requestMatchers(HttpMethod.HEAD, "/api/topics/**").permitAll();
 
 
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
@@ -92,7 +93,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList("https://regal-selkie-67277e.netlify.app"));
         //configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
 
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 
