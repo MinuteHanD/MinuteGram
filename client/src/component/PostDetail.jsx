@@ -61,7 +61,7 @@ const PostDetails = () => {
   useEffect(() => {
     fetchPostDetails();
 
-    // Scroll position detection
+    
     const handleScroll = () => {
       if (window.scrollY > 500) {
         setScrollToTop(true);
@@ -74,7 +74,7 @@ const PostDetails = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [postId]);
 
-  // Scroll to top function
+  
   const scrollUp = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

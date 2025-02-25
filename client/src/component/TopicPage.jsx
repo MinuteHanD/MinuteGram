@@ -7,7 +7,7 @@ import {
   Image as ImageIcon, Link as LinkIcon, Clock, Users, TrendingUp
 } from 'lucide-react';
 
-// Shared components
+
 const Card = React.memo(({ children, className = '', ...props }) => (
   <div 
     className={`bg-zinc-900 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-lg shadow-black/20 ${className}`}
@@ -313,14 +313,14 @@ export const TopicPage = () => {
     };
   }, [topicId, sortBy]);
 
-  // Filter buttons for sorting
+  
   const filterButtons = [
     { id: 'newest', label: 'Newest', icon: Clock },
     { id: 'popular', label: 'Popular', icon: TrendingUp },
     { id: 'discussed', label: 'Most Discussed', icon: MessageCircle },
   ];
 
-  // Post skeleton for loading state
+ 
   const renderPostSkeleton = () => (
     <Card className="p-6 space-y-4">
       <div className="flex items-start justify-between">

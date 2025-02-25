@@ -20,5 +20,6 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     boolean existsByName(String name);
     Page<Topic> findAll(Pageable pageable);
     Optional<Topic> findById(Long id);
+    Page<Topic> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
 }

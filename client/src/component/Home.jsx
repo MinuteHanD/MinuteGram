@@ -228,25 +228,7 @@ const Home = () => {
                 />
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex items-center p-1 bg-zinc-900 border border-zinc-800 rounded-lg">
-                  {filterButtons.map((filter) => {
-                    const Icon = filter.icon;
-                    return (
-                      <button
-                        key={filter.id}
-                        onClick={() => setActiveFilter(filter.id)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
-                          activeFilter === filter.id
-                            ? 'bg-teal-600 text-white'
-                            : 'text-zinc-400 hover:text-white'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="hidden sm:inline">{filter.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                
                 {token && (
                   <button 
                     onClick={() => setShowForm(true)}
