@@ -48,7 +48,7 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    // 1. Updated Endpoints
+
 
     @GetMapping("/posts")
     @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
@@ -102,7 +102,7 @@ public class AdminController {
         return ResponseEntity.ok(dtoPage);
     }
 
-    // 2. New Endpoints for Dashboard Data
+
 
     @GetMapping("/stats")
     @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
@@ -186,5 +186,43 @@ public class AdminController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @PostMapping("/users/{userId}/role")
+    public ResponseEntity<?> updateUserRole(
+            @PathVariable Long userId,
+            @RequestParam Role newRole
+    ) {
+        User updatedUser = adminService.updateUserRole(userId, newRole);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        try {
+            adminService.deletePost(postId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+        try {
+            adminService.deleteComment(commentId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/topics/{topicId}")
+    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
+    public ResponseEntity<?> deleteTopic(@PathVariable Long topicId) {
+        topicRepository.deleteById(topicId);
+        return ResponseEntity.ok().build();
     }
 }
