@@ -24,6 +24,11 @@ public class TopicController {
     @Autowired
     private TopicService topicService;
 
+    @GetMapping
+    public Page<Topic> getAllTopics(Pageable pageable) {
+        return topicService.getAllTopics(pageable);
+    }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TopicDto> createTopic(@Valid @RequestBody TopicCreateDto topicDto) {
@@ -31,14 +36,7 @@ public class TopicController {
         return ResponseEntity.ok(TopicDto.from(topic));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<TopicDto>> getAllTopics(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Topic> topics = topicService.getAllTopics(pageable);
-        return ResponseEntity.ok(topics.map(TopicDto::from));
-    }
+
 
     @GetMapping("/{id}/posts")
     public ResponseEntity<Page<PostResponseDto>> getTopicPosts(

@@ -11,14 +11,17 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import com.fuckgram.entity.User;
-
+import org.springframework.cache.annotation.Cacheable;
 import java.awt.desktop.UserSessionEvent;
 import org.springframework.data.domain.Pageable;
+import org.springframework.cache.annotation.CacheEvict;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -34,7 +37,7 @@ public class TopicService {
 
 
 
-
+    @CacheEvict(value = "topics", allEntries = true)
     public Topic createTopic(TopicCreateDto topicDto) {
         User currentUser = userService.getCurrentUser();
 
@@ -51,8 +54,17 @@ public class TopicService {
         return topicRepository.save(topic);
     }
 
-    public Page<Topic> getAllTopics(Pageable pageable){
-        return topicRepository.findAll(pageable);
+    @Cacheable(value = "topics", key = "'all'")
+    public List<Topic> getAllTopicsList() {
+        return topicRepository.findAll();
+    }
+
+    public Page<Topic> getAllTopics(Pageable pageable) {
+        List<Topic> allTopics = getAllTopicsList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allTopics.size());
+        List<Topic> pagedTopics = allTopics.subList(start, end);
+        return new PageImpl<>(pagedTopics, pageable, allTopics.size());
     }
 
     public Topic getTopicByName(String name){
