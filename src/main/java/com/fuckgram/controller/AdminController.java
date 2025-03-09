@@ -106,14 +106,8 @@ public class AdminController {
 
     @GetMapping("/stats")
     @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
-    public ResponseEntity<Map<String, Long>> getStats() {
-        Map<String, Long> stats = new HashMap<>();
-        stats.put("totalPosts", postRepository.count());
-        stats.put("totalComments", commentRepository.count());
-        stats.put("totalTopics", topicRepository.count());
-        stats.put("totalUsers", userRepository.count());
-        stats.put("activeUsers", userRepository.countByBannedFalse());
-        stats.put("bannedUsers", userRepository.countByBannedTrue());
+    public ResponseEntity<Map<String, Object>> getStats() {
+        Map<String, Object> stats = adminService.getStats();
         return ResponseEntity.ok(stats);
     }
 
