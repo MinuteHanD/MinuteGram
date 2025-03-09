@@ -17,19 +17,19 @@ public class CacheConfig {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // Configure ObjectMapper with default settings
+
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
                 .build();
 
-        // Use Jackson JSON serializer
+
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        // Configure default cache settings
+
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
                 .entryTtl(Duration.ofHours(1)); // Default TTL of 1 hour
 
-        // Custom cache configurations
+
         RedisCacheConfiguration topicsConfig = config.entryTtl(Duration.ofHours(1));
         RedisCacheConfiguration topicPostsConfig = config.entryTtl(Duration.ofMinutes(5));
 

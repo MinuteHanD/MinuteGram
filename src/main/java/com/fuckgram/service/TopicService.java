@@ -9,18 +9,11 @@ import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.TopicRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.fuckgram.entity.User;
-import org.springframework.cache.annotation.Cacheable;
-import java.awt.desktop.UserSessionEvent;
-import org.springframework.data.domain.Pageable;
-import org.springframework.cache.annotation.CacheEvict;
 
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,15 +28,11 @@ public class TopicService {
     @Autowired
     private PostRepository postRepository;
 
-
-
-    @CacheEvict(value = "topics", allEntries = true)
     public Topic createTopic(TopicCreateDto topicDto) {
         User currentUser = userService.getCurrentUser();
 
-        if (topicRepository.existsByName(topicDto.getName())){
+        if (topicRepository.existsByName(topicDto.getName())) {
             throw new TopicAlreadyExistsException("Topic with this name already exists");
-
         }
 
         Topic topic = new Topic();
@@ -54,20 +43,11 @@ public class TopicService {
         return topicRepository.save(topic);
     }
 
-    @Cacheable(value = "topics", key = "'all'")
-    public List<Topic> getAllTopicsList() {
-        return topicRepository.findAll();
-    }
-
     public Page<Topic> getAllTopics(Pageable pageable) {
-        List<Topic> allTopics = getAllTopicsList();
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), allTopics.size());
-        List<Topic> pagedTopics = allTopics.subList(start, end);
-        return new PageImpl<>(pagedTopics, pageable, allTopics.size());
+        return topicRepository.findAll(pageable);
     }
 
-    public Topic getTopicByName(String name){
+    public Topic getTopicByName(String name) {
         return topicRepository.findByName(name)
                 .orElseThrow(() -> new TopicNotFoundException("Topic not found: " + name));
     }
