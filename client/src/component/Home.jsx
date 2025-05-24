@@ -181,7 +181,7 @@ const Home = () => {
                   Welcome to <span className="text-teal-400">Minutegram</span>
                 </h1>
                 <p className="text-zinc-400 text-lg mb-6">
-                  Cum back soon
+                  Come back soon
                 </p>
                 {!token && (
                   <div className="flex flex-col sm:flex-row gap-3">
