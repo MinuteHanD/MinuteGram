@@ -4,7 +4,7 @@ MinuteGram is a streamlined social platform that organizes content into topics a
 
 ## Tech Stack
 
-The backend is implemented in Java with Spring Boot. The frontend is built using your preferred JavaScript framework. Data is persisted in PostgreSQL.
+The backend is implemented in Java with Spring Boot. The frontend is built using React framework. Data is persisted in PostgreSQL.
 
 The app can be accessed here:
 https://regal-selkie-67277e.netlify.app/
