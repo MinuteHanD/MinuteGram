@@ -10,7 +10,7 @@ import com.fuckgram.exception.TopicNotFoundException;
 import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.TopicRepository;
 import com.fuckgram.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fuckgram.dto.SecurityUser;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> createPost(
             @RequestPart("post") String postJson,
             @RequestPart(value = "image", required = false) MultipartFile image,
-            @AuthenticationPrincipal UserDetails userDetails) throws Exception {
+            @AuthenticationPrincipal SecurityUser userDetails) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
         PostCreateDto postDto = objectMapper.readValue(postJson, PostCreateDto.class);
@@ -70,7 +71,7 @@ public class PostController {
 
     @PostMapping("/{postId}/like")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> likePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> likePost(@PathVariable Long postId, @AuthenticationPrincipal SecurityUser userDetails) {
         User currentUser = userService.getCurrentUser();
         try {
             postService.likePost(postId, currentUser.getId());
@@ -82,7 +83,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}/like")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> unlikePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> unlikePost(@PathVariable Long postId, @AuthenticationPrincipal SecurityUser userDetails) {
         User currentUser = userService.getCurrentUser();
         try {
             postService.unlikePost(postId, currentUser.getId());

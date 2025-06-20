@@ -4,20 +4,15 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,7 +67,7 @@ public class User implements UserDetails {
         return createdTopics;
     }
 
-    public void SetCreatedTopics(List<Topic> createdTopics) {
+    public void setCreatedTopics(List<Topic> createdTopics) {
         this.createdTopics = createdTopics;
     }
 
@@ -160,48 +155,15 @@ public class User implements UserDetails {
         this.posts = posts;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return credentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled && !banned;
-    }
-
     public boolean isBanned() {
         return banned;
     }
 
     public void setBanned(boolean banned) {
         this.banned = banned;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
