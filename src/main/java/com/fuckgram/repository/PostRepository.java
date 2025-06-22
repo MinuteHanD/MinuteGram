@@ -13,17 +13,21 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Page<Post> findAllByTopic(Topic topic, Pageable pageable);
-
     /**
-     * Fetch posts with aggregated like and comment counts in one query to avoid N+1 subselects.
-     * The constructor signature is:
-     * (Long id, String content, String title, String authorName, String topicName, String imageUrl, String mediaType, LocalDateTime createdAt, int likesCount, int commentsCount)
+     * Fetch a single post with aggregated counts directly into a DTO.
      */
+    @Query("SELECT new com.fuckgram.dto.PostResponseDto(" +
+           "p.id, p.content, p.title, p.user.name, p.topic.name, " +
+           "p.imageUrl, p.mediaType, p.createdAt, " +
+           "size(p.likedByUsers), size(p.comments)) " +
+           "FROM Post p WHERE p.id = :postId")
+    Optional<PostResponseDto> findProjectedById(@Param("postId") Long postId);
+
     @Query(
         value = "SELECT new com.fuckgram.dto.PostResponseDto(" +
                 "p.id, p.content, p.title, p.user.name, p.topic.name, " +

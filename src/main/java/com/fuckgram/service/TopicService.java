@@ -1,24 +1,20 @@
 package com.fuckgram.service;
 
+import com.fuckgram.dto.PostResponseDto;
 import com.fuckgram.dto.TopicCreateDto;
 import com.fuckgram.dto.TopicDto;
-import com.fuckgram.dto.PostResponseDto;
-import com.fuckgram.entity.Post;
+import com.fuckgram.dto.TopicWithPostsDto;
 import com.fuckgram.entity.Topic;
 import com.fuckgram.entity.User;
 import com.fuckgram.exception.TopicAlreadyExistsException;
 import com.fuckgram.exception.TopicNotFoundException;
 import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.TopicRepository;
-
-// WRONG IMPORT: import jakarta.transaction.Transactional;
-// CORRECT IMPORT for readOnly attribute:
-import org.springframework.transaction.annotation.Transactional; 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -46,35 +42,39 @@ public class TopicService {
 
     @Transactional(readOnly = true)
     public Page<TopicDto> getAllTopics(Pageable pageable) {
-        // Uses the optimized projection with COUNT for postCount
         return topicRepository.findAllProjected(pageable);
     }
 
-    public Topic getTopicByName(String name) {
-        return topicRepository.findByName(name)
-                .orElseThrow(() -> new TopicNotFoundException("Topic not found: " + name));
+    /**
+     * NEW METHOD: Gets topic details and its posts in one go.
+     */
+    @Transactional(readOnly = true)
+    public TopicWithPostsDto getTopicWithPosts(Long topicId, Pageable pageable) {
+        // Step 1: Get the topic DTO
+        TopicDto topicDto = topicRepository.findProjectedById(topicId)
+                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + topicId));
+        
+        // Step 2: Get the posts for that topic
+        // We need the Topic *entity* for the repository query
+        Topic topicEntity = topicRepository.findById(topicId)
+                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + topicId));
+        Page<PostResponseDto> postsPage = postRepository.findAllProjectedByTopic(topicEntity, pageable);
+
+        // Step 3: Combine and return
+        return new TopicWithPostsDto(topicDto, postsPage);
     }
 
-    // Modified to take ID for consistency with controller
+    @Transactional(readOnly = true)
+    public TopicDto getTopicDtoById(Long id) {
+        return topicRepository.findProjectedById(id)
+                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + id));
+    }
+    
+    // This is kept for backwards compatibility or other uses, but the new endpoint is better.
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getTopicPosts(Long topicId, Pageable pageable) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new RuntimeException("Topic not found: " + topicId));
         return postRepository.findAllProjectedByTopic(topic, pageable);
-    }
-
-    // This fetches the raw entity, which is okay for single-item updates/logic.
-    public Topic getTopicById(Long id) {
-        return topicRepository.findById(id)
-                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + id));
-    }
-    
-    // --- NEW METHOD FOR THE OPTIMIZED CONTROLLER ---
-    // This fetches a single topic as a DTO, preventing any N+1 issues.
-    // NOTE: You will need to add the corresponding `findProjectedById` query to your TopicRepository.
-    @Transactional(readOnly = true)
-    public TopicDto getTopicDtoById(Long id) {
-        return topicRepository.findProjectedById(id)
-                .orElseThrow(() -> new TopicNotFoundException("Topic not found with id: " + id));
     }
 }

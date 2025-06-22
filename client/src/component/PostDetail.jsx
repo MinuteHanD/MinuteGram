@@ -1,335 +1,321 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../service/apiClient';
 import { 
-  MessageSquare, 
   Send, 
   User, 
   Clock, 
-  ThumbsUp, 
+  Heart, 
+  MessageCircle,
   ArrowLeft, 
   Share2, 
   Bookmark, 
-  MoreHorizontal,
-  ChevronUp
+  MoreHorizontal
 } from 'lucide-react';
 
-const PostDetails = () => {
+const Card = ({ children, className = '', ...props }) => (
+  <div 
+    className={`bg-zinc-900 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-lg shadow-black/20 ${className}`}
+    {...props}
+  >
+    {children}
+  </div>
+);
+
+const Button = ({ 
+  children, 
+  variant = 'primary', 
+  className = '', 
+  type = 'button',
+  disabled = false,
+  ...props 
+}) => {
+  const baseStyles = 'rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const variants = {
+    primary: 'bg-teal-600 hover:bg-teal-500 text-zinc-100 disabled:hover:bg-teal-600',
+    secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
+    ghost: 'hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200',
+  };
+  
+  return (
+    <button type={type} disabled={disabled} className={`${baseStyles} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+const IconButton = ({ icon: Icon, label, active = false, ...props }) => (
+  <button
+    className={`p-2 rounded-lg ${active ? 'bg-teal-600 text-white' : 'hover:bg-zinc-700/50 text-zinc-400 hover:text-zinc-200'} transition-all flex items-center gap-2`}
+    {...props}
+  >
+    <Icon className="w-5 h-5" />
+    {label && <span className="text-sm">{label}</span>}
+  </button>
+);
+
+const PostSkeleton = () => (
+    <div className="animate-pulse">
+        <Card className="p-6 md:p-8 space-y-6">
+            <div className="h-8 w-3/4 bg-zinc-800 rounded"></div>
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-zinc-800"></div>
+                <div className="space-y-2">
+                    <div className="h-4 w-24 bg-zinc-800 rounded"></div>
+                    <div className="h-4 w-32 bg-zinc-800 rounded"></div>
+                </div>
+            </div>
+            <div className="h-40 w-full bg-zinc-800 rounded-lg"></div>
+            <div className="space-y-3">
+                <div className="h-4 w-full bg-zinc-800 rounded"></div>
+                <div className="h-4 w-full bg-zinc-800 rounded"></div>
+                <div className="h-4 w-5/6 bg-zinc-800 rounded"></div>
+            </div>
+        </Card>
+        <Card className="mt-6 p-6 md:p-8">
+            <div className="h-6 w-1/4 bg-zinc-800 rounded mb-6"></div>
+            <div className="space-y-4">
+                <div className="h-16 w-full bg-zinc-800 rounded-lg"></div>
+                <div className="h-16 w-full bg-zinc-800 rounded-lg"></div>
+            </div>
+        </Card>
+    </div>
+);
+
+const PostDetail = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const commentInputRef = useRef(null);
 
-  const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
+  const [postData, setPostData] = useState({ post: null, comments: [] });
   const [newComment, setNewComment] = useState('');
-  const [scrollToTop, setScrollToTop] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchPostDetails = async () => {
     try {
-      const postResponse = await api.get(`/posts/${postId}`);
-      const commentsResponse = await api.get(`/comments/post/${postId}`);
-      setPost(postResponse.data);
-      setComments(commentsResponse.data);
+      const response = await api.get(`/posts/${postId}`);
+      setPostData(response.data);
     } catch (err) {
-      alert('Failed to fetch post or comments');
-    }
-  };
-
-  const addComment = async () => {
-    try {
-      await api.post('/comments', { content: newComment, postId });
-      setNewComment('');
-      fetchPostDetails();
-    } catch (err) {
-      alert('Failed to add comment');
-    }
-  };
-
-  const handleLike = async () => {
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    try {
-      await api.post(`/posts/${postId}/like`);
-      fetchPostDetails();
-    } catch (err) {
-      alert('Failed to like post');
+      console.error('Failed to fetch post details:', err);
+      alert('Failed to fetch post details. It might have been deleted.');
+      navigate('/');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchPostDetails();
-
-    
-    const handleScroll = () => {
-      if (window.scrollY > 500) {
-        setScrollToTop(true);
-      } else {
-        setScrollToTop(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, [postId]);
 
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim() || isSubmitting) return;
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await api.post('/comments', {
+        content: newComment,
+        postId: Number(postId)
+      });
+      setNewComment('');
+      await fetchPostDetails(); // Refetch all data to get the new comment
+    } catch (err) {
+      console.error('Failed to add comment:', err);
+      alert('Failed to add comment. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   
-  const scrollUp = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleInteraction = async (type) => {
+    if (!token) {
+        navigate('/login');
+        return;
+    }
+    
+    // Optimistic UI update for likes
+    if (type === 'like') {
+        const originalPost = postData.post;
+        const isLiked = originalPost.liked;
+        const newLikesCount = isLiked ? originalPost.likesCount - 1 : originalPost.likesCount + 1;
+        
+        setPostData(prev => ({
+            ...prev,
+            post: {
+                ...prev.post,
+                liked: !isLiked,
+                likesCount: newLikesCount
+            }
+        }));
+        
+        try {
+            await api.post(`/posts/${postId}/like`);
+            // We can refetch to ensure consistency, but for likes, optimistic is often enough
+            // fetchPostDetails(); 
+        } catch (err) {
+            console.error('Failed to like post:', err);
+            setPostData(prev => ({...prev, post: originalPost})); // Revert on error
+        }
+    }
+    
+    if (type === 'share') {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
   };
 
-  if (!post) {
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-zinc-950">
-        <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5" />
-        <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-10 bg-repeat" />
-        <div className="relative py-24">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="space-y-6">
-              {/* Skeleton loaders */}
-              <div className="h-10 w-2/3 bg-zinc-800 rounded-lg animate-pulse" />
-              <div className="h-6 w-1/3 bg-zinc-800 rounded-lg animate-pulse" />
-              <div className="h-96 bg-zinc-800 rounded-xl animate-pulse" />
-              <div className="space-y-4">
-                <div className="h-4 w-full bg-zinc-800 rounded animate-pulse" />
-                <div className="h-4 w-full bg-zinc-800 rounded animate-pulse" />
-                <div className="h-4 w-3/4 bg-zinc-800 rounded animate-pulse" />
-              </div>
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto py-8">
+            <PostSkeleton />
         </div>
-      </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-zinc-950">
-      {/* Background effects from Home page */}
-      <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5" />
-      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-10 bg-repeat" />
-      
-      {/* Main content */}
-      <div className="relative py-24">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Back button */}
-          <button 
-            onClick={() => navigate(-1)}
-            className="mb-8 flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors group"
-          >
-            <div className="p-2 bg-zinc-900 rounded-full group-hover:bg-teal-500/10 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-            </div>
-            <span>Back to topics</span>
-          </button>
+  const { post, comments } = postData;
 
-          {/* Post content */}
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden mb-8">
-            {/* Post header */}
-            <div className="p-6 md:p-8">
-              <h1 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                {post.title}
-              </h1>
-              
-              <div className="flex flex-wrap items-center gap-5 mb-6">
-                {/* Author info */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center">
-                    <User className="w-5 h-5 text-teal-400" />
-                  </div>
-                  <div>
-                    <div className="text-white font-medium">
-                      {post.authorName || 'Anonymous'}
+  if (!post) {
+    return (
+      <div className="text-center py-20 text-zinc-400">
+        Post not found.
+      </div>
+    );
+  }
+  
+  const Comment = ({ comment }) => (
+    <div className="flex items-start gap-4">
+        <div className="w-10 h-10 rounded-full bg-teal-900/50 flex items-center justify-center">
+            <User className="w-5 h-5 text-teal-400" />
+        </div>
+        <div className="flex-1">
+            <div className="flex items-center gap-2">
+                <span className="font-semibold text-zinc-200">{comment.authorName}</span>
+                <span className="text-xs text-zinc-500">•</span>
+                <span className="text-xs text-zinc-500">
+                    {new Date(comment.createdAt).toLocaleDateString()}
+                </span>
+            </div>
+            <p className="text-zinc-300 mt-1">{comment.content}</p>
+        </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-200">
+        <div className="max-w-4xl mx-auto py-8 px-4 space-y-6">
+            <Button variant="secondary" onClick={() => navigate(-1)} className="mb-4">
+                <ArrowLeft className="w-5 h-5" />
+                <span>Back to Topic</span>
+            </Button>
+
+            {/* Post Content Card */}
+            <Card className="p-6 md:p-8 space-y-6">
+                <h1 className="text-3xl md:text-4xl font-bold text-white">{post.title}</h1>
+                
+                <div className="flex items-center gap-4 border-b border-t border-zinc-800 py-4">
+                    <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center">
+                        <User className="w-5 h-5 text-teal-400" />
                     </div>
-                    <div className="text-xs text-zinc-500">
-                      Author
+                    <div>
+                        <p className="font-semibold text-zinc-200">{post.authorName}</p>
+                        <p className="text-sm text-zinc-400">
+                            Posted on {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
                     </div>
-                  </div>
+                </div>
+
+                {post.imageUrl && (
+                    <div className="rounded-lg overflow-hidden border border-zinc-700">
+                        {post.mediaType === 'video' ? (
+                            <video controls src={post.imageUrl} className="w-full max-h-[500px] object-contain bg-black" />
+                        ) : (
+                            <img src={post.imageUrl} alt={post.title} className="w-full max-h-[500px] object-contain bg-black" />
+                        )}
+                    </div>
+                )}
+
+                <div className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap">
+                    {post.content}
                 </div>
                 
-                {/* Date & time */}
-                <div className="flex items-center gap-2 text-zinc-400 text-sm">
-                  <Clock className="w-4 h-4 text-teal-400" />
-                  <span>
-                    {new Date(post.createdAt).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </span>
+                <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
+                    <div className="flex items-center gap-4">
+                        <IconButton
+                            icon={Heart}
+                            label={post.likesCount?.toString() || '0'}
+                            active={post.liked}
+                            onClick={() => handleInteraction('like')}
+                        />
+                        <IconButton
+                            icon={MessageCircle}
+                            label={comments.length?.toString() || '0'}
+                            onClick={() => commentInputRef.current?.focus()}
+                        />
+                        <IconButton
+                            icon={Share2}
+                            onClick={() => handleInteraction('share')}
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <IconButton
+                            icon={Bookmark}
+                            active={post.bookmarked}
+                            onClick={() => handleInteraction('bookmark')}
+                        />
+                        <IconButton
+                            icon={MoreHorizontal}
+                        />
+                    </div>
                 </div>
-              </div>
+            </Card>
 
-              {/* Media content (if any) */}
-              {post.imageUrl && (
-                <div className="rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800 mb-6">
-                  {post.mediaType === 'video' ? (
-                    <video
-                      controls
-                      src={post.imageUrl}
-                      className="w-full max-h-[500px] object-contain"
-                    />
-                  ) : (
-                    <img
-                      src={post.imageUrl}
-                      alt={post.title}
-                      className="w-full max-h-[500px] object-contain"
-                    />
-                  )}
-                </div>
-              )}
-
-              {/* Post content */}
-              <div className="text-zinc-300 leading-relaxed whitespace-pre-line">
-                {post.content}
-              </div>
-              
-              {/* Action buttons */}
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-zinc-800">
-                <div className="flex items-center gap-4">
-                  <button 
-                    className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors"
-                    onClick={handleLike}
-                  >
-                    <ThumbsUp className={`w-5 h-5 ${post.liked ? 'fill-teal-400 text-teal-400' : ''}`} />
-                    <span className="text-sm">{post.likesCount || 0}</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors">
-                    <MessageSquare className="w-5 h-5" />
-                    <span className="text-sm">{comments.length} Comments</span>
-                  </button>
-                </div>
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors">
-                    <Share2 className="w-5 h-5" />
-                    <span className="text-sm hidden sm:inline">Share</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-zinc-400 hover:text-teal-400 transition-colors">
-                    <Bookmark className="w-5 h-5" />
-                    <span className="text-sm hidden sm:inline">Save</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Comments section */}
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
-            <div className="p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="bg-teal-500/10 p-2 rounded">
-                  <MessageSquare className="w-5 h-5 text-teal-400" />
-                </div>
-                <h2 className="text-xl font-semibold text-white">
-                  Comments ({comments.length})
+            {/* Comments Section Card */}
+            <Card className="p-6 md:p-8">
+                <h2 className="text-2xl font-bold text-white mb-6">
+                    {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
                 </h2>
-              </div>
 
-              {/* Comment form */}
-              {token ? (
-                <div className="mb-8">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-teal-500/20 flex-shrink-0 flex items-center justify-center">
-                      <User className="w-5 h-5 text-teal-400" />
-                    </div>
-                    <div className="flex-1">
-                      <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Write a comment..."
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-white resize-none focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors min-h-[120px]"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={addComment}
-                      disabled={!newComment.trim()}
-                      className="bg-teal-600 hover:bg-teal-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg transition-colors flex items-center gap-2"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>Post Comment</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-6 mb-8 text-center">
-                  <p className="text-zinc-400 mb-4">Login to join the conversation</p>
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>Sign In</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Comments list */}
-              <div className="space-y-6">
-                {comments.length > 0 ? (
-                  comments.map((comment) => (
-                    <div key={comment.id} className="border-b border-zinc-800 pb-6 last:border-b-0 last:pb-0">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-teal-500/10 flex-shrink-0 flex items-center justify-center">
-                          <User className="w-5 h-5 text-teal-400" />
-                        </div>
+                {token && (
+                    <form onSubmit={handleAddComment} className="flex items-start gap-4 mb-8">
+                        <div className="w-10 h-10 rounded-full bg-zinc-800 flex-shrink-0" />
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-white">
-                              {comment.authorName || 'Anonymous'}
-                            </span>
-                            <span className="text-xs text-zinc-500">•</span>
-                            <span className="text-xs text-zinc-500">
-                              {new Date(comment.createdAt).toLocaleDateString(undefined, {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
-                            </span>
-                          </div>
-                          <p className="text-zinc-300">{comment.content}</p>
-                          <div className="flex items-center gap-4 mt-2">
-                            <button className="text-xs text-zinc-500 hover:text-teal-400 transition-colors">
-                              Like
-                            </button>
-                            <button className="text-xs text-zinc-500 hover:text-teal-400 transition-colors">
-                              Reply
-                            </button>
-                          </div>
+                            <textarea
+                                ref={commentInputRef}
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="Add a comment..."
+                                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-zinc-100 focus:border-teal-500 focus:ring-teal-500/50 transition resize-none"
+                                rows="3"
+                            />
+                            <div className="flex justify-end mt-2">
+                                <Button type="submit" disabled={!newComment.trim() || isSubmitting}>
+                                    {isSubmitting ? 'Posting...' : 'Post Comment'}
+                                    <Send className="w-4 h-4 ml-2" />
+                                </Button>
+                            </div>
                         </div>
-                        <button className="text-zinc-500 hover:text-white p-1">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="bg-teal-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <MessageSquare className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-white mb-2">No comments yet</h3>
-                    <p className="text-zinc-400">Be the first to share your thoughts</p>
-                  </div>
+                    </form>
                 )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Scroll to top button */}
-      {scrollToTop && (
-        <button
-          onClick={scrollUp}
-          className="fixed bottom-8 right-8 bg-zinc-800/80 hover:bg-teal-600 border border-zinc-700 rounded-full p-3 text-white shadow-lg transition-colors backdrop-blur-sm"
-        >
-          <ChevronUp className="w-5 h-5" />
-        </button>
-      )}
+                <div className="space-y-6">
+                    {comments.length > 0 ? (
+                        comments.map(comment => <Comment key={comment.id} comment={comment} />)
+                    ) : (
+                        <p className="text-zinc-400 text-center py-8">Be the first to comment.</p>
+                    )}
+                </div>
+            </Card>
+        </div>
     </div>
   );
 };
 
-export default PostDetails;
+export default PostDetail;

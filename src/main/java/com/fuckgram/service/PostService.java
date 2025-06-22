@@ -2,6 +2,7 @@ package com.fuckgram.service;
 
 import com.fuckgram.dto.PostCreateDto;
 import com.fuckgram.dto.PostResponseDto;
+import com.fuckgram.dto.PostWithCommentsDto;
 import com.fuckgram.entity.Post;
 import com.fuckgram.entity.Topic;
 import com.fuckgram.entity.User;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional
@@ -26,17 +26,20 @@ public class PostService {
     private final UserService userService;
     private final StorageService storageService;
     private final UserRepository userRepository;
+    private final CommentService commentService; // Add this
 
     public PostService(PostRepository postRepository,
                        TopicRepository topicRepository,
                        UserService userService,
                        StorageService storageService,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       CommentService commentService) { // Add this
         this.postRepository = postRepository;
         this.topicRepository = topicRepository;
         this.userService = userService;
         this.storageService = storageService;
         this.userRepository = userRepository;
+        this.commentService = commentService; // Add this
     }
 
     private Post createPostEntity(PostCreateDto postDto, String imageUrl, String mediaType, Topic topic, User currentUser) {
@@ -62,7 +65,8 @@ public class PostService {
         Post post = createPostEntity(postDto, imageUrl, mediaType, topic, currentUser);
         Post savedPost = postRepository.save(post);
 
-        return PostResponseDto.fromEntity(savedPost);
+        return postRepository.findProjectedById(savedPost.getId())
+            .orElseThrow(() -> new RuntimeException("Could not find newly created post. This should not happen."));
     }
 
     private void validatePostInput(PostCreateDto postDto) {
@@ -71,15 +75,32 @@ public class PostService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Page<PostResponseDto> getAllPosts(Pageable pageable) {
         return postRepository.findAllProjectedBy(pageable);
     }
 
+    @Transactional(readOnly = true)
     public Post getPostById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
     }
 
+    /**
+     * NEW METHOD: Fetches a post and its comments all at once.
+     */
+    @Transactional(readOnly = true)
+    public PostWithCommentsDto getPostWithComments(Long postId) {
+        // Step 1: Get the post DTO efficiently.
+        PostResponseDto postDto = postRepository.findProjectedById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        
+        // Step 2: Get the comments using our already optimized method.
+        var comments = commentService.getPostComments(postId);
+
+        // Step 3: Combine them and return.
+        return new PostWithCommentsDto(postDto, comments);
+    }
     
     public void deletePost(Long postId) {
         Post post = getPostById(postId);

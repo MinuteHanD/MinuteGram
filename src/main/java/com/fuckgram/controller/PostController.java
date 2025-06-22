@@ -2,6 +2,7 @@ package com.fuckgram.controller;
 
 import com.fuckgram.dto.PostCreateDto;
 import com.fuckgram.dto.PostResponseDto;
+import com.fuckgram.dto.PostWithCommentsDto;
 import com.fuckgram.entity.Post;
 import com.fuckgram.entity.User;
 import com.fuckgram.repository.PostRepository;
@@ -54,21 +55,13 @@ public class PostController {
         PostCreateDto postDto = objectMapper.readValue(postJson, PostCreateDto.class);
 
         String imageUrl = null;
-        String mediaType = null;
         if (image != null && !image.isEmpty()) {
             Map<String, String> uploadResult = storageService.store(image);
             imageUrl = uploadResult.get("url");
-            mediaType = uploadResult.get("mediaType");
+            // mediaType is set in the service now
         }
-
+        
         PostResponseDto responseDto = postService.createPost(postDto, imageUrl);
-        if (mediaType != null) {
-            Post post = postService.getPostById(responseDto.getId());
-            post.setMediaType(mediaType);
-            postRepository.save(post);
-            responseDto.setMediaType(mediaType);
-        }
-
         return ResponseEntity.ok(responseDto);
     }
 
@@ -105,10 +98,15 @@ public class PostController {
         return ResponseEntity.ok(postsPage);
     }
 
+    /**
+     * REWRITTEN FOR PERFORMANCE
+     * This single endpoint now returns the post and all its comments.
+     * Your frontend should call this instead of calling two separate endpoints.
+     */
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> getPostById(@PathVariable Long postId) {
-        Post post = postService.getPostById(postId);
-        return ResponseEntity.ok(PostResponseDto.fromEntity(post));
+    public ResponseEntity<PostWithCommentsDto> getPostById(@PathVariable Long postId) {
+        PostWithCommentsDto data = postService.getPostWithComments(postId);
+        return ResponseEntity.ok(data);
     }
 
 }
