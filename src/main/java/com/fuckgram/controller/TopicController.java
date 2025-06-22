@@ -48,10 +48,7 @@ public class TopicController {
         return ResponseEntity.ok(topicsPage);
     }
 
-    /**
-     * NEW ENDPOINT for fetching a topic and its posts together.
-     * The frontend should now use this.
-     */
+    
     @GetMapping("/{id}/details")
     public ResponseEntity<TopicWithPostsDto> getTopicWithPosts(
             @PathVariable Long id,
@@ -65,7 +62,7 @@ public class TopicController {
         return ResponseEntity.ok(data);
     }
 
-    // This endpoint remains for cases where you ONLY need posts, but /details is better.
+    
     @GetMapping("/{id}/posts")
     public ResponseEntity<Page<PostResponseDto>> getTopicPosts(
             @PathVariable Long id,

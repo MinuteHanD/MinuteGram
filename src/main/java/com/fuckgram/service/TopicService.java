@@ -45,9 +45,7 @@ public class TopicService {
         return topicRepository.findAllProjected(pageable);
     }
 
-    /**
-     * NEW METHOD: Gets topic details and its posts in one go.
-     */
+    
     @Transactional(readOnly = true)
     public TopicWithPostsDto getTopicWithPosts(Long topicId, Pageable pageable) {
         // Step 1: Get the topic DTO

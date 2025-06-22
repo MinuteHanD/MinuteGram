@@ -26,20 +26,20 @@ public class PostService {
     private final UserService userService;
     private final StorageService storageService;
     private final UserRepository userRepository;
-    private final CommentService commentService; // Add this
+    private final CommentService commentService; // 
 
     public PostService(PostRepository postRepository,
                        TopicRepository topicRepository,
                        UserService userService,
                        StorageService storageService,
                        UserRepository userRepository,
-                       CommentService commentService) { // Add this
+                       CommentService commentService) { 
         this.postRepository = postRepository;
         this.topicRepository = topicRepository;
         this.userService = userService;
         this.storageService = storageService;
         this.userRepository = userRepository;
-        this.commentService = commentService; // Add this
+        this.commentService = commentService; // 
     }
 
     private Post createPostEntity(PostCreateDto postDto, String imageUrl, String mediaType, Topic topic, User currentUser) {
@@ -86,19 +86,17 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
     }
 
-    /**
-     * NEW METHOD: Fetches a post and its comments all at once.
-     */
+    
     @Transactional(readOnly = true)
     public PostWithCommentsDto getPostWithComments(Long postId) {
-        // Step 1: Get the post DTO efficiently.
+        
         PostResponseDto postDto = postRepository.findProjectedById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
         
-        // Step 2: Get the comments using our already optimized method.
+        
         var comments = commentService.getPostComments(postId);
 
-        // Step 3: Combine them and return.
+        
         return new PostWithCommentsDto(postDto, comments);
     }
     

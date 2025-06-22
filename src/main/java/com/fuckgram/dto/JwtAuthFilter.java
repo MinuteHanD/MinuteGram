@@ -27,7 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private TokenManagementService tokenManagementService;
 
-    // THE UserRepository DEPENDENCY IS GONE. IT DOES NOT BELONG HERE.
+    
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -57,13 +57,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 // NO DATABASE CALL HERE.
-                // We trust the token because we've validated its signature.
+                
                 List<String> roles = jwtService.extractRoles(token);
                 List<SimpleGrantedAuthority> authorities = roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-                // We don't have the full User entity, and we DON'T NEED IT.
+                
                 // We create a token with the principal's name and their authorities.
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userEmail, // The principal can just be the username string

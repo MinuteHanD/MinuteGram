@@ -98,11 +98,7 @@ public class PostController {
         return ResponseEntity.ok(postsPage);
     }
 
-    /**
-     * REWRITTEN FOR PERFORMANCE
-     * This single endpoint now returns the post and all its comments.
-     * Your frontend should call this instead of calling two separate endpoints.
-     */
+    
     @GetMapping("/{postId}")
     public ResponseEntity<PostWithCommentsDto> getPostById(@PathVariable Long postId) {
         PostWithCommentsDto data = postService.getPostWithComments(postId);
