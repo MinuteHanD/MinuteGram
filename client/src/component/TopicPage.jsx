@@ -4,168 +4,215 @@ import api from '../service/apiClient';
 import { 
   MessageSquare, FileText, Plus, X, Upload, 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, 
-  Clock, TrendingUp
+  Clock, TrendingUp, Sparkles, Send, Image as ImageIcon, Video, Link, Eye, User, Calendar
 } from 'lucide-react';
 
-const Card = React.memo(({ children, className = '', ...props }) => (
+// Reusable Components - keeping these separate because, like, modularity. It's important.
+// Updated Card with a more defined border and subtle gradient
+const ModernCard = React.memo(({ children, className = '', ...props }) => (
   <div 
-    className={`bg-zinc-900 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-lg shadow-black/20 ${className}`}
+    className={`bg-zinc-900/60 backdrop-blur-lg border border-zinc-700/70 rounded-2xl shadow-xl shadow-black/30 ${className}`}
     {...props}
   >
     {children}
   </div>
 ));
 
-const Button = React.memo(({ 
+// Updated Button with more subtle hover and active states for consistency with the new design
+const ModernButton = React.memo(({ 
   children, 
   variant = 'primary', 
   className = '', 
   type = 'button',
   disabled = false,
   size = 'md',
+  onClick,
   ...props 
 }) => {
-  const baseStyles = 'rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-98';
   const variants = {
-    primary: 'bg-teal-600 hover:bg-teal-500 text-zinc-100 disabled:hover:bg-teal-600',
+    primary: 'bg-gradient-to-br from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white shadow-lg shadow-teal-500/20',
     secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
-    ghost: 'hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200',
-    danger: 'bg-red-600 hover:bg-red-500 text-zinc-100'
+    ghost: 'hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-100',
+    danger: 'bg-red-600 hover:bg-red-500 text-white',
+    outline: 'border border-teal-500 text-teal-400 hover:bg-teal-500/10'
   };
   const sizes = {
     sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2',
-    lg: 'px-6 py-3 text-lg'
+    md: 'px-5 py-2.5',
+    lg: 'px-7 py-3 text-lg'
   };
   
   return (
-    <button type={type} disabled={disabled} className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
+    <button 
+      type={type} 
+      disabled={disabled} 
+      onClick={onClick}
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} 
+      {...props}
+    >
       {children}
     </button>
   );
 });
 
-const IconButton = React.memo(({ icon: Icon, label, active = false, ...props }) => (
+// Updated IconButton for better visual feedback
+const ModernIconButton = React.memo(({ icon: Icon, label, active = false, onClick, className = '', ...props }) => (
   <button
-    className={`p-2 rounded-lg ${active ? 'bg-teal-600 text-white' : 'hover:bg-zinc-700/50 text-zinc-400 hover:text-zinc-200'} transition-all flex items-center gap-2`}
+    className={`p-2.5 rounded-lg group ${active ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20' : 'hover:bg-zinc-800/70 text-zinc-400 hover:text-zinc-100'} transition-all flex items-center justify-center gap-2`}
+    onClick={onClick}
     {...props}
   >
-    <Icon className="w-5 h-5" />
-    {label && <span className="text-sm">{label}</span>}
+    <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-100'}`} />
+    {label && <span className="text-sm font-medium">{label}</span>}
   </button>
 ));
 
-const PostCard = React.memo(({ post, onInteraction }) => {
+// Input and Textarea components for consistent styling
+const ModernInput = React.memo(({ label, id, type = 'text', className = '', ...props }) => (
+  <div className="space-y-1">
+    {label && <label htmlFor={id} className="block text-sm font-medium text-zinc-400">{label}</label>}
+    <input
+      id={id}
+      type={type}
+      className={`w-full p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors duration-200 ${className}`}
+      {...props}
+    />
+  </div>
+));
+
+const ModernTextarea = React.memo(({ label, id, className = '', ...props }) => (
+  <div className="space-y-1">
+    {label && <label htmlFor={id} className="block text-sm font-medium text-zinc-400">{label}</label>}
+    <textarea
+      id={id}
+      rows="4"
+      className={`w-full p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none resize-y transition-colors duration-200 ${className}`}
+      {...props}
+    ></textarea>
+  </div>
+));
+
+// Post Card for this page - simplified and more focused
+const TopicPostCard = React.memo(({ post, onInteraction }) => {
     const navigate = useNavigate();
-    const [isExpanded, setIsExpanded] = useState(false);
-    const contentPreviewLength = 280;
+    const contentPreviewLength = 200; // Shorter preview for a denser feed
     const hasLongContent = post.content.length > contentPreviewLength;
 
+    const handleCardClick = (e) => {
+      // Navigate to post detail only if the click wasn't on an interactive element
+      if (!e.target.closest('button')) {
+        navigate(`/posts/${post.id}`);
+      }
+    };
+
     return (
-        <Card 
-        className="p-6 hover:border-teal-500/30 transition-all space-y-4 cursor-pointer"
-        onClick={() => navigate(`/posts/${post.id}`)}
+        <ModernCard 
+        className="p-5 flex flex-col group hover:border-teal-500/50 transition-all duration-300 transform hover:scale-[1.01]"
+        onClick={handleCardClick}
         >
-            <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-teal-500/10 flex items-center justify-center flex-shrink-0">
-                        <MessageSquare className="w-6 h-6 text-teal-400" />
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-semibold text-zinc-100 break-all">
-                        {post.title || 'Untitled'}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-zinc-400 mt-1">
-                            <span>By {post.authorName}</span>
-                        </div>
+            {/* Image/Video Thumbnail - prominent feature */}
+            {post.imageUrl && (
+                <div className="relative rounded-lg overflow-hidden border border-zinc-700/60 bg-zinc-900 mb-4 aspect-video">
+                    {post.mediaType === 'video' ? (
+                        <video
+                            src={post.imageUrl}
+                            className="w-full h-full object-cover"
+                            muted // Muted for preview
+                            loop // Loop for preview
+                        />
+                    ) : (
+                        <img
+                            src={post.imageUrl}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                        />
+                    )}
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <ModernButton size="sm" variant="primary" onClick={handleCardClick}>
+                            <Eye className="w-4 h-4"/> View Post
+                        </ModernButton>
                     </div>
                 </div>
-                <IconButton 
-                    icon={MoreHorizontal} 
-                    onClick={(e) => e.stopPropagation()}
-                />
-            </div>
-            <div className="space-y-4 pl-16">
-                <p className="text-zinc-300 leading-relaxed">
-                    {isExpanded ? post.content : `${post.content.slice(0, contentPreviewLength)}${hasLongContent ? '...' : ''}`}
-                    {hasLongContent && (
-                        <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsExpanded(!isExpanded);
-                        }}
-                        className="ml-2 text-teal-400 hover:text-teal-300 font-medium"
-                        >
-                        {isExpanded ? 'Show less' : 'Read more'}
-                        </button>
-                    )}
+            )}
+
+            {/* Post Details */}
+            <div className="flex-1 flex flex-col">
+                <h3 className="text-lg font-bold text-zinc-100 mb-2 line-clamp-2 leading-snug break-words">
+                  {post.title || 'Untitled Post'}
+                </h3>
+                <p className="text-zinc-400 text-sm mb-3 line-clamp-3">
+                    {post.content.slice(0, contentPreviewLength)}{hasLongContent ? '...' : ''}
                 </p>
 
-                {post.imageUrl && (
-                    <div className="relative rounded-xl overflow-hidden border border-zinc-700 bg-zinc-900">
-                        {post.mediaType === 'video' ? (
-                            <video
-                                controls
-                                src={post.imageUrl}
-                                className="max-h-96 w-full object-cover"
-                            />
-                        ) : (
-                            <img
-                                src={post.imageUrl}
-                                alt={post.title}
-                                className="max-h-96 w-full object-cover"
-                            />
-                        )}
+                {/* Author and Date */}
+                <div className="flex items-center gap-3 text-xs text-zinc-500 mb-4 mt-auto">
+                    <div className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        <span className="font-medium text-teal-400">@{post.authorName}</span>
                     </div>
-                )}
+                    <span className="text-zinc-600">•</span>
+                    <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>{new Date(post.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    </div>
+                </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-zinc-700/50">
-                    <div className="flex items-center gap-4">
-                        <IconButton
+                {/* Interaction Buttons - smaller and more compact */}
+                <div className="flex items-center justify-between pt-3 border-t border-zinc-700/50">
+                    <div className="flex items-center gap-3">
+                        <ModernIconButton
                             icon={Heart}
                             label={post.likesCount?.toString() || '0'}
                             active={post.liked}
                             onClick={(e) => { e.stopPropagation(); onInteraction('like', post.id); }}
+                            className="!p-2" // Smaller padding
                         />
-                        <IconButton
+                        <ModernIconButton
                             icon={MessageCircle}
                             label={post.commentsCount?.toString() || '0'}
                             onClick={(e) => { e.stopPropagation(); onInteraction('comment', post.id); }}
+                            className="!p-2"
                         />
-                        <IconButton icon={Share2} onClick={(e) => { e.stopPropagation(); onInteraction('share', post.id); }} />
+                        <ModernIconButton 
+                            icon={Share2} 
+                            onClick={(e) => { e.stopPropagation(); onInteraction('share', post.id); }} 
+                            className="!p-2 hidden sm:flex" // Hide on small screens
+                        />
                     </div>
-                    <IconButton icon={Bookmark} active={post.bookmarked} onClick={(e) => { e.stopPropagation(); onInteraction('bookmark', post.id); }} />
+                    <ModernIconButton 
+                        icon={Bookmark} 
+                        active={post.bookmarked} 
+                        onClick={(e) => { e.stopPropagation(); onInteraction('bookmark', post.id); }} 
+                        className="!p-2"
+                    />
                 </div>
             </div>
-        </Card>
+        </ModernCard>
     );
 });
 
 const PostSkeleton = () => (
-    <Card className="p-6 space-y-4">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-zinc-800"></div>
-          <div>
-            <div className="h-6 w-48 bg-zinc-800 rounded mb-2"></div>
-            <div className="h-4 w-32 bg-zinc-800 rounded"></div>
-          </div>
+    <ModernCard className="p-5 flex flex-col animate-pulse">
+      <div className="relative rounded-lg overflow-hidden bg-zinc-800/80 mb-4 aspect-video"></div>
+      <div className="h-5 w-3/4 bg-zinc-800/80 rounded-md mb-2"></div>
+      <div className="h-4 w-full bg-zinc-800/80 rounded-md mb-1"></div>
+      <div className="h-4 w-5/6 bg-zinc-800/80 rounded-md mb-4"></div>
+      
+      <div className="flex items-center gap-3 text-xs mb-4 mt-auto">
+          <div className="h-4 w-20 bg-zinc-800/80 rounded-md"></div>
+          <div className="h-4 w-16 bg-zinc-800/80 rounded-md"></div>
+      </div>
+
+      <div className="flex items-center justify-between pt-3 border-t border-zinc-700/50">
+        <div className="flex gap-3">
+          <div className="h-8 w-14 bg-zinc-800/80 rounded-lg"></div>
+          <div className="h-8 w-14 bg-zinc-800/80 rounded-lg"></div>
+          <div className="h-8 w-10 bg-zinc-800/80 rounded-lg hidden sm:block"></div>
         </div>
+        <div className="h-8 w-10 bg-zinc-800/80 rounded-lg"></div>
       </div>
-      <div className="space-y-3 pl-16">
-        <div className="h-4 w-full bg-zinc-800 rounded"></div>
-        <div className="h-4 w-full bg-zinc-800 rounded"></div>
-        <div className="h-4 w-3/4 bg-zinc-800 rounded"></div>
-      </div>
-      <div className="pt-4 border-t border-zinc-700/50 flex justify-between pl-16">
-        <div className="flex gap-4">
-          <div className="h-8 w-16 bg-zinc-800 rounded"></div>
-          <div className="h-8 w-16 bg-zinc-800 rounded"></div>
-          <div className="h-8 w-10 bg-zinc-800 rounded"></div>
-        </div>
-        <div className="h-8 w-10 bg-zinc-800 rounded"></div>
-      </div>
-    </Card>
+    </ModernCard>
 );
 
 export const TopicPage = () => {
@@ -181,13 +228,12 @@ export const TopicPage = () => {
     const [mediaFile, setMediaFile] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [sortBy, setSortBy] = useState('newest');
+    const [sortBy, setSortBy] = useState('newest'); // Default to 'newest'
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchTopicDetails = useCallback(async () => {
         setIsLoading(true);
         try {
-            // SINGLE API call to get topic and posts together
             const response = await api.get(`/topics/${topicId}/details`, {
                 params: {
                     sort: sortBy === 'newest' ? 'createdAt,desc' : 'likesCount,desc'
@@ -197,7 +243,7 @@ export const TopicPage = () => {
             setPosts(response.data.posts.content);
         } catch (err) {
             console.error('Failed to fetch topic details:', err);
-            alert('Failed to fetch topic');
+            alert('Ugh, failed to fetch topic details. So annoying.');
         } finally {
             setIsLoading(false);
         }
@@ -221,7 +267,7 @@ export const TopicPage = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (isSubmitting || !topic) return;
 
@@ -251,60 +297,239 @@ export const TopicPage = () => {
             fetchTopicDetails();
         } catch (err) {
             console.error('Failed to create post:', err);
-            alert('Failed to create post');
+            alert('Failed to create post. This is so not fetch.');
         } finally {
             setIsSubmitting(false);
         }
     };
     
     const handlePostInteraction = (type, postId) => {
-      // This function can be expanded with optimistic updates like in PostDetail
-      if (!token) return navigate('/login');
-      if (type === 'comment') return navigate(`/posts/${postId}`);
-      // Simple refetch for other interactions for now
+      if (!token) {
+        return navigate('/login');
+      }
+      if (type === 'comment') {
+        return navigate(`/posts/${postId}`);
+      }
       fetchTopicDetails();
     }
     
     const filterButtons = [
         { id: 'newest', label: 'Newest', icon: Clock },
         { id: 'popular', label: 'Popular', icon: TrendingUp },
-        { id: 'discussed', label: 'Most Discussed', icon: MessageCircle },
     ];
     
     return (
-        <div className="relative pt-24 pb-12 min-h-screen bg-zinc-950">
-            <div className="fixed inset-0 bg-gradient-to-br from-teal-900/5 via-zinc-900/5 to-zinc-900/5 -z-10" />
-            <div className="max-w-4xl mx-auto px-4 space-y-8">
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-800 mb-8">
-                    <div className="absolute inset-0 bg-gradient-to-r from-teal-600/10 to-emerald-600/10"></div>
-                    <div className="relative p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-4 rounded-lg bg-teal-500/10"><FileText className="w-8 h-8 text-teal-400" /></div>
-                            <div>
-                                {isLoading ? <div className="h-9 w-48 bg-zinc-700 rounded animate-pulse" /> : <h1 className="text-3xl font-bold text-white">{topic?.name}</h1>}
-                                {isLoading ? <div className="h-5 w-32 bg-zinc-700 rounded mt-2 animate-pulse" /> : <p className="text-zinc-400 mt-1">{topic?.description}</p>}
+        <div className="relative min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 font-sans">
+            {/* Background Gradient & Effects from Homepage */}
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-900/10 via-transparent to-transparent -z-10"></div>
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-900/5 via-transparent to-transparent -z-10"></div>
+            <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5 bg-repeat -z-10"></div>
+            
+            {/* Content Area */}
+            <main className="relative pt-24 pb-12">
+                <div className="max-w-7xl mx-auto px-6 space-y-12">
+                    {/* Topic Header - now more of a distinct, almost "magazine" style banner */}
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900/90 to-zinc-800/80 border border-zinc-700/60 shadow-2xl">
+                        {/* Subtle background overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-teal-600/10 to-emerald-600/10 opacity-70"></div>
+                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+                        
+                        <div className="relative p-8 lg:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div className="flex items-center gap-5">
+                                <div className="p-4 rounded-xl bg-teal-500/15 flex-shrink-0 shadow-md">
+                                    <FileText className="w-9 h-9 text-teal-400" />
+                                </div>
+                                <div>
+                                    {isLoading ? (
+                                        <>
+                                            <div className="h-10 w-64 bg-zinc-700 rounded-lg animate-pulse" />
+                                            <div className="h-6 w-48 bg-zinc-700 rounded-md mt-3 animate-pulse" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <h1 className="text-4xl font-extrabold text-white leading-tight">
+                                                {topic?.name}
+                                            </h1>
+                                            <p className="text-zinc-400 mt-2 text-lg max-w-lg">
+                                                {topic?.description}
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            {token && (
+                                <ModernButton 
+                                    onClick={() => setShowForm(!showForm)} 
+                                    size="lg"
+                                    className="shrink-0 group"
+                                >
+                                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+                                    <span>Create New Post</span>
+                                    <Sparkles className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </ModernButton>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Create Post Form - using the new modal style for consistency */}
+                    {showForm && (
+                        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                            <div className="relative w-full max-w-3xl">
+                                <div className="absolute inset-0 bg-gradient-to-r from-teal-600/20 to-cyan-600/20 rounded-3xl blur-xl"></div>
+                                <div className="relative bg-zinc-900/95 backdrop-blur-xl rounded-3xl border border-zinc-700/50 shadow-2xl">
+                                    <div className="p-8">
+                                        <div className="flex justify-between items-center mb-8">
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-white mb-2">Create New Post in "{topic?.name}"</h2>
+                                                <p className="text-zinc-400">Share your thoughts, media, or questions with the community.</p>
+                                            </div>
+                                            <button 
+                                                onClick={() => setShowForm(false)} 
+                                                className="text-zinc-400 hover:text-white transition-colors rounded-full p-2 hover:bg-zinc-800/50"
+                                            >
+                                                <X className="w-6 h-6" />
+                                            </button>
+                                        </div>
+                                        
+                                        <form onSubmit={handleFormSubmit} className="space-y-6">
+                                            <ModernInput
+                                                id="post-title"
+                                                label="Post Title"
+                                                placeholder="A catchy title for your post..."
+                                                value={formData.title}
+                                                onChange={(e) => setFormData(prevState => ({ ...prevState, title: e.target.value }))}
+                                                required
+                                            />
+                                            <ModernTextarea
+                                                id="post-content"
+                                                label="Your Message"
+                                                placeholder="What's on your mind? Share details, insights, or questions."
+                                                value={formData.content}
+                                                onChange={(e) => setFormData(prevState => ({ ...prevState, content: e.target.value }))}
+                                                required
+                                            />
+
+                                            {/* Media Upload Section */}
+                                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    onChange={handleFileChange}
+                                                    className="hidden"
+                                                    accept="image/*,video/*"
+                                                />
+                                                <ModernButton 
+                                                    type="button" 
+                                                    onClick={() => fileInputRef.current?.click()} 
+                                                    variant="secondary"
+                                                    className="w-full sm:w-auto"
+                                                >
+                                                    <Upload className="w-5 h-5"/>
+                                                    Upload Media
+                                                </ModernButton>
+                                                {mediaFile && (
+                                                    <div className="flex items-center gap-2 text-zinc-300 text-sm bg-zinc-800/50 px-3 py-2 rounded-lg border border-zinc-700/60 w-full sm:w-auto overflow-hidden text-ellipsis whitespace-nowrap">
+                                                        <span className="truncate">{mediaFile.name}</span>
+                                                        <ModernIconButton 
+                                                            icon={X} 
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setMediaFile(null);
+                                                                if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+                                                                setMediaPreview(null);
+                                                                if (fileInputRef.current) fileInputRef.current.value = '';
+                                                            }} 
+                                                            className="text-zinc-500 hover:text-zinc-100 hover:bg-zinc-700/60 !p-1"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {mediaPreview && (
+                                                <div className="mt-4 relative w-full h-64 bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700 flex items-center justify-center">
+                                                    {mediaFile && mediaFile.type.startsWith('video/') ? (
+                                                        <video src={mediaPreview} controls className="max-h-full max-w-full object-contain" />
+                                                    ) : (
+                                                        <img src={mediaPreview} alt="Media preview" className="max-h-full max-w-full object-contain" />
+                                                    )}
+                                                    <ModernIconButton 
+                                                        icon={X} 
+                                                        className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white" 
+                                                        onClick={() => {
+                                                            setMediaFile(null);
+                                                            if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+                                                            setMediaPreview(null);
+                                                            if (fileInputRef.current) fileInputRef.current.value = '';
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="flex justify-end gap-4 pt-6">
+                                                <ModernButton 
+                                                    type="button" 
+                                                    variant="ghost" 
+                                                    onClick={() => setShowForm(false)}
+                                                >
+                                                    Cancel
+                                                </ModernButton>
+                                                <ModernButton 
+                                                    type="submit" 
+                                                    disabled={isSubmitting || !formData.title || !formData.content}
+                                                >
+                                                    {isSubmitting ? 'Posting...' : <><Send className="w-5 h-5"/> Post Now</>}
+                                                </ModernButton>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        {token && <Button onClick={() => setShowForm(!showForm)}><Plus className="w-5 h-5" /><span>Create Post</span></Button>}
+                    )}
+
+                    {/* Filter and Sort options - a dedicated section now */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/60 shadow-inner">
+                        <span className="text-zinc-400 text-base font-semibold mr-2">Browse Posts:</span>
+                        <div className="flex gap-3 flex-wrap justify-center sm:justify-start">
+                            {filterButtons.map(button => (
+                                <ModernButton
+                                    key={button.id}
+                                    variant={sortBy === button.id ? 'primary' : 'outline'}
+                                    size="sm"
+                                    onClick={() => setSortBy(button.id)}
+                                    className={sortBy !== button.id ? 'hover:text-teal-300 hover:border-teal-400' : ''}
+                                >
+                                    <button.icon className="w-4 h-4" />
+                                    {button.label}
+                                </ModernButton>
+                            ))}
+                        </div>
                     </div>
-                </div>
-
-                {showForm && (
-                  <Card className="p-6 mb-8 border-teal-500/20">
-                    {/* ... form JSX from your original code ... */}
-                  </Card>
-                )}
-
-                <div className="space-y-6">
+                    
+                    {/* Posts Grid - main display of posts */}
                     {isLoading ? (
-                        Array(3).fill(0).map((_, i) => <PostSkeleton key={i} />)
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array(6).fill(0).map((_, i) => <PostSkeleton key={i} />)}
+                        </div>
                     ) : posts.length > 0 ? (
-                        posts.map(post => <PostCard key={post.id} post={post} onInteraction={handlePostInteraction} />)
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {posts.map(post => <TopicPostCard key={post.id} post={post} onInteraction={handlePostInteraction} />)}
+                        </div>
                     ) : (
-                        <Card className="py-16 text-center"><h3 className="text-2xl font-semibold text-zinc-100">No posts yet</h3></Card>
+                        <ModernCard className="py-20 text-center flex flex-col items-center justify-center">
+                            <img src="https://assets-global.website-files.com/5f69ac96ef2c5608ed1165cd/601d51f28b4c2b9a7b7a1e0b_EmptyState.svg" alt="No posts" className="w-48 h-48 mb-6 opacity-80"/>
+                            <h3 className="text-3xl font-bold text-zinc-100 mb-3">No posts yet!</h3>
+                            <p className="text-zinc-400 text-lg max-w-md">Be the first to share something amazing in this topic.</p>
+                            {token && (
+                                <ModernButton onClick={() => setShowForm(true)} className="mt-8 group">
+                                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"/> Start a New Post
+                                    <Sparkles className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </ModernButton>
+                            )}
+                        </ModernCard>
                     )}
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
