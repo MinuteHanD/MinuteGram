@@ -50,7 +50,7 @@ public class AdminController {
             @RequestParam(defaultValue = "") String search) {
         Pageable pageable = PageRequest.of(page, size);
         // Use the new, efficient projection query. No more .map()
-        Page<PostResponseDto> dtoPage = postRepository.findProjectedByTitleContainingIgnoreCase(search, pageable);
+        Page<PostResponseDto> dtoPage = postRepository.findAllProjectedBy(pageable);
         return ResponseEntity.ok(dtoPage);
     }
 

@@ -1,6 +1,6 @@
 package com.fuckgram.repository;
 
-import com.fuckgram.dto.PostResponseDto; // Added necessary import
+import com.fuckgram.dto.PostResponseDto;
 import com.fuckgram.entity.Post;
 import com.fuckgram.entity.Topic;
 import org.springframework.data.domain.Page;
@@ -19,13 +19,37 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByTopic(Topic topic, Pageable pageable);
 
-    // --- PROJECTION QUERY FOR ADMIN POSTS PAGE ---
-    @Query("SELECT new com.fuckgram.dto.PostResponseDto(" +
-           "   p.id, p.content, p.title, p.user.name, p.topic.name, " +
-           "   p.imageUrl, p.mediaType, p.createdAt, " +
-           "   size(p.likedByUsers), size(p.comments)) " +
-           "FROM Post p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :title, '%'))")
-    Page<PostResponseDto> findProjectedByTitleContainingIgnoreCase(@Param("title") String title, Pageable pageable);
+    /**
+     * Fetch posts with aggregated like and comment counts in one query to avoid N+1 subselects.
+     * The constructor signature is:
+     * (Long id, String content, String title, String authorName, String topicName, String imageUrl, String mediaType, LocalDateTime createdAt, int likesCount, int commentsCount)
+     */
+    @Query(
+        value = "SELECT new com.fuckgram.dto.PostResponseDto(" +
+                "p.id, p.content, p.title, p.user.name, p.topic.name, " +
+                "p.imageUrl, p.mediaType, p.createdAt, " +
+                "CAST(COUNT(DISTINCT l) AS int), CAST(COUNT(DISTINCT c) AS int)) " +
+        "FROM Post p " +
+        "LEFT JOIN p.likedByUsers l " +
+        "LEFT JOIN p.comments c " +
+        "GROUP BY p.id, p.content, p.title, p.user.name, p.topic.name, p.imageUrl, p.mediaType, p.createdAt",
+        countQuery = "SELECT COUNT(p) FROM Post p"
+    )
+    Page<PostResponseDto> findAllProjectedBy(Pageable pageable);
+
+    @Query(
+        value = "SELECT new com.fuckgram.dto.PostResponseDto(" +
+                "p.id, p.content, p.title, p.user.name, p.topic.name, " +
+                "p.imageUrl, p.mediaType, p.createdAt, " +
+                "CAST(COUNT(DISTINCT l) AS int), CAST(COUNT(DISTINCT c) AS int)) " +
+        "FROM Post p " +
+        "LEFT JOIN p.likedByUsers l " +
+        "LEFT JOIN p.comments c " +
+        "WHERE p.topic = :topic " +
+        "GROUP BY p.id, p.content, p.title, p.user.name, p.topic.name, p.imageUrl, p.mediaType, p.createdAt",
+        countQuery = "SELECT COUNT(p) FROM Post p WHERE p.topic = :topic"
+    )
+    Page<PostResponseDto> findAllProjectedByTopic(@Param("topic") Topic topic, Pageable pageable);
 
     @Query("SELECT DATE(p.createdAt) as date, COUNT(p) as count FROM Post p WHERE p.createdAt >= :startDate GROUP BY DATE(p.createdAt)")
     List<Object[]> countPostsByDate(@Param("startDate") LocalDateTime startDate);

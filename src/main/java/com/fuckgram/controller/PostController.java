@@ -10,6 +10,9 @@ import com.fuckgram.service.PostService;
 import com.fuckgram.service.StorageService;
 import com.fuckgram.service.UserService;
 import jakarta.validation.Valid;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -94,10 +97,12 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostResponseDto> getAllPosts() {
-        return postService.getAllPosts().stream()
-                .map(PostResponseDto::fromEntity)
-                .collect(Collectors.toList());
+    public ResponseEntity<Page<PostResponseDto>> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        Page<PostResponseDto> postsPage = postService.getAllPosts(pageable);
+        return ResponseEntity.ok(postsPage);
     }
 
     @GetMapping("/{postId}")

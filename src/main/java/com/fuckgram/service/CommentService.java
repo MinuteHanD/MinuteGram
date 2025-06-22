@@ -8,15 +8,19 @@ import com.fuckgram.entity.Post;
 import com.fuckgram.entity.User;
 import com.fuckgram.repository.CommentRepository;
 import com.fuckgram.repository.PostRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional // Use Spring's Transactional annotation
 public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
@@ -45,60 +49,73 @@ public class CommentService {
         }
 
         Comment savedComment = commentRepository.save(comment);
+        // Using fromEntity here is fine because it's a single object, not a list.
         return CommentResponseDto.fromEntity(savedComment);
     }
 
+    /**
+     * REWRITTEN FOR PERFORMANCE.
+     * Fetches all comments for a post in a single query and then assembles the reply hierarchy in memory.
+     * @param postId The ID of the post.
+     * @return A list of top-level comment DTOs, with nested replies.
+     */
+    @Transactional(readOnly = true)
     public List<CommentResponseDto> getPostComments(Long postId) {
-        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
+        // Step 1: Fetch ALL comment DTOs for the post in ONE efficient query.
+        List<CommentResponseDto> allCommentDtos = commentRepository.findDtosByPostId(postId);
 
-        // Map top-level comments to DTOs
-        List<CommentResponseDto> commentDtos = comments.stream()
-                .filter(comment -> comment.getParentComment() == null) // Top-level comments
-                .map(comment -> {
-                    CommentResponseDto dto = CommentResponseDto.fromEntity(comment);
+        // Step 2: Create a map for quick access to each comment by its ID.
+        Map<Long, CommentResponseDto> commentMap = allCommentDtos.stream()
+                .collect(Collectors.toMap(CommentResponseDto::getId, comment -> comment));
 
-                    // Fetch and attach replies
-                    List<CommentResponseDto> replies = commentRepository.findByParentCommentIdOrderByCreatedAt(comment.getId())
-                            .stream()
-                            .map(CommentResponseDto::fromEntity)
-                            .collect(Collectors.toList());
-                    dto.setReplies(replies); // Add replies to the DTO
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        // Step 3: Assemble the hierarchy.
+        List<CommentResponseDto> topLevelComments = new ArrayList<>();
+        for (CommentResponseDto commentDto : allCommentDtos) {
+            // Check if the comment is a reply.
+            if (commentDto.getParentCommentId() != null) {
+                CommentResponseDto parent = commentMap.get(commentDto.getParentCommentId());
+                if (parent != null) {
+                    // It's a reply, so add it to its parent's list of replies.
+                    parent.getReplies().add(commentDto);
+                }
+            } else {
+                // It's a top-level comment.
+                topLevelComments.add(commentDto);
+            }
+        }
+        
+        // Sort replies by creation date if needed (optional, adds minor overhead)
+        for (CommentResponseDto parent : topLevelComments) {
+            parent.getReplies().sort((r1, r2) -> r1.getCreatedAt().compareTo(r2.getCreatedAt()));
+        }
+        
+        // Sort top-level comments by creation date (descending)
+        topLevelComments.sort((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()));
 
-        return commentDtos;
+        return topLevelComments;
     }
 
 
+    /**
+     * This method is now less efficient than getPostComments but can be kept for specific cases
+     * where you only need the direct replies to a single known comment.
+     */
+    @Transactional(readOnly = true)
     public List<CommentResponseDto> getCommentReplies(Long parentCommentId) {
         return commentRepository.findByParentCommentIdOrderByCreatedAt(parentCommentId)
                 .stream()
-                .map(CommentResponseDto::fromEntity)
+                .map(CommentResponseDto::fromEntity) // BEWARE: This causes N+1 on the author name for each reply.
                 .collect(Collectors.toList());
     }
 
-    public List<CommentResponseDto> getAllComments() {
-        // Fetch all top-level comments across all posts
-        List<Comment> comments = commentRepository.findAll();
-
-        // Convert to DTOs with nested replies
-        return comments.stream()
-                .filter(comment -> comment.getParentComment() == null) // Only top-level comments
-                .map(comment -> {
-                    CommentResponseDto dto = CommentResponseDto.fromEntity(comment);
-
-                    // Fetch and attach replies
-                    List<CommentResponseDto> replies = commentRepository.findByParentCommentIdOrderByCreatedAt(comment.getId())
-                            .stream()
-                            .map(CommentResponseDto::fromEntity)
-                            .collect(Collectors.toList());
-                    dto.setReplies(replies);
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    /**
+     * Used for the admin panel. This is still slow due to fromEntity.
+     * It should also be converted to a projection if the admin panel comment view is slow.
+     */
+    @Transactional(readOnly = true)
+    public Page<CommentResponseDto> getAllComments(Pageable pageable) {
+        // TODO: Create a projection for this in CommentRepository to improve admin panel performance.
+        return commentRepository.findAll(pageable).map(CommentResponseDto::fromEntity);
     }
-
-
 
 }

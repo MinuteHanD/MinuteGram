@@ -38,3 +38,4 @@ env.sh
 repomix-output.txt
 ### React ###
 node_modules
+repomix-output.xml

@@ -1,8 +1,10 @@
 package com.fuckgram.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fuckgram.entity.Comment;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentResponseDto {
@@ -11,15 +13,46 @@ public class CommentResponseDto {
     private String authorName;
     private LocalDateTime createdAt;
     private Long parentCommentId;
-    private List<CommentResponseDto> replies;
-    private String postTitle;  
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) // Don't show the 'replies' field if it's empty
+    private List<CommentResponseDto> replies = new ArrayList<>();
+    private String postTitle;
 
+    // Default constructor for frameworks like Jackson
+    public CommentResponseDto() {}
+
+    /**
+     * High-performance constructor for JPA Projections.
+     * The database query will call this directly to build the DTO.
+     * @param id The comment's ID.
+     * @param content The comment's text.
+     * @param authorName The name of the user who made the comment.
+     * @param createdAt The timestamp of creation.
+     * @param parentCommentId The ID of the parent comment, if it's a reply.
+     * @param postTitle The title of the post the comment belongs to.
+     */
+    public CommentResponseDto(Long id, String content, String authorName, LocalDateTime createdAt, Long parentCommentId, String postTitle) {
+        this.id = id;
+        this.content = content;
+        this.authorName = authorName;
+        this.createdAt = createdAt;
+        this.parentCommentId = parentCommentId;
+        this.postTitle = postTitle;
+    }
+
+
+    /**
+     * Legacy factory method. Still useful for creating a DTO from a single, fully-loaded entity.
+     * For example, after creating a brand new comment.
+     * AVOIDING THIS for lists of comments is the key to performance.
+     */
     public static CommentResponseDto fromEntity(Comment comment) {
         CommentResponseDto dto = new CommentResponseDto();
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
+        // This line causes an N+1 query if used in a loop!
         dto.setAuthorName(comment.getUser().getName());
         dto.setCreatedAt(comment.getCreatedAt());
+        // This line also causes an N+1 query if used in a loop!
         dto.setPostTitle(comment.getPost().getTitle());
 
         if (comment.getParentComment() != null) {
@@ -29,6 +62,8 @@ public class CommentResponseDto {
         return dto;
     }
 
+
+    // --- GETTERS AND SETTERS ---
 
     public String getPostTitle() {
         return postTitle;
@@ -86,4 +121,3 @@ public class CommentResponseDto {
         this.parentCommentId = parentCommentId;
     }
 }
-

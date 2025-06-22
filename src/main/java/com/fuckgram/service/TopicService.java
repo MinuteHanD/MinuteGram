@@ -2,6 +2,7 @@ package com.fuckgram.service;
 
 import com.fuckgram.dto.TopicCreateDto;
 import com.fuckgram.dto.TopicDto;
+import com.fuckgram.dto.PostResponseDto;
 import com.fuckgram.entity.Post;
 import com.fuckgram.entity.Topic;
 import com.fuckgram.entity.User;
@@ -45,6 +46,7 @@ public class TopicService {
 
     @Transactional(readOnly = true)
     public Page<TopicDto> getAllTopics(Pageable pageable) {
+        // Uses the optimized projection with COUNT for postCount
         return topicRepository.findAllProjected(pageable);
     }
 
@@ -55,10 +57,10 @@ public class TopicService {
 
     // Modified to take ID for consistency with controller
     @Transactional(readOnly = true)
-    public Page<Post> getTopicPosts(Long topicId, Pageable pageable) {
+    public Page<PostResponseDto> getTopicPosts(Long topicId, Pageable pageable) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new RuntimeException("Topic not found: " + topicId));
-        return postRepository.findAllByTopic(topic, pageable);
+        return postRepository.findAllProjectedByTopic(topic, pageable);
     }
 
     // This fetches the raw entity, which is okay for single-item updates/logic.

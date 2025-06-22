@@ -59,10 +59,8 @@ public class TopicController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        // Assume you will create a similar high-performance projection for posts next.
-        // For now, the old logic remains, but it's the next thing to fix.
-        Page<Post> posts = topicService.getTopicPosts(id, pageable);
-        return ResponseEntity.ok(posts.map(PostResponseDto::fromEntity));
+        Page<PostResponseDto> posts = topicService.getTopicPosts(id, pageable);
+        return ResponseEntity.ok(posts);
     }
     
     // --- ENDPOINT REWRITTEN FOR PERFORMANCE ---

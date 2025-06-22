@@ -10,6 +10,8 @@ import com.fuckgram.exception.TopicNotFoundException;
 import com.fuckgram.repository.PostRepository;
 import com.fuckgram.repository.TopicRepository;
 import com.fuckgram.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -69,8 +71,8 @@ public class PostService {
         }
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public Page<PostResponseDto> getAllPosts(Pageable pageable) {
+        return postRepository.findAllProjectedBy(pageable);
     }
 
     public Post getPostById(Long id) {

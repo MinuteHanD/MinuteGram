@@ -17,12 +17,19 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     boolean existsByName(String name);
     Optional<Topic> findById(Long id);
 
-    // --- PROJECTION QUERIES FOR HIGH PERFORMANCE ---
-
-    @Query("SELECT new com.fuckgram.dto.TopicDto(" +
-           "   t.id, t.name, t.description, t.createdAt, " +
-           "   t.creator.id, t.creator.name, size(t.posts)) " +
-           "FROM Topic t")
+    /**
+     * Fetch topics with aggregated post counts in one query to avoid N+1 subselects.
+     * The constructor signature is:
+     * (Long id, String name, String description, LocalDateTime createdAt, Long creatorId, String creatorName, int postCount)
+     */
+    @Query(
+        value = "SELECT new com.fuckgram.dto.TopicDto(" +
+                "t.id, t.name, t.description, t.createdAt, t.creator.id, t.creator.name, CAST(COUNT(p) AS int)) " +
+        "FROM Topic t " +
+        "LEFT JOIN t.posts p " +
+        "GROUP BY t.id, t.name, t.description, t.createdAt, t.creator.id, t.creator.name",
+        countQuery = "SELECT COUNT(t) FROM Topic t"
+    )
     Page<TopicDto> findAllProjected(Pageable pageable);
 
     @Query("SELECT new com.fuckgram.dto.TopicDto(" +
