@@ -48,33 +48,50 @@ public class StorageService {
     
     private Map<String, String> storeLocally(MultipartFile file) {
         try {
-           
+            // Validate file
+            if (file == null || file.isEmpty()) {
+                throw new RuntimeException("File is empty or null");
+            }
+            
+            // Create upload directory
             String uploadDir = System.getProperty("user.home") + "/minutegram/uploads";
             java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
             if (!java.nio.file.Files.exists(uploadPath)) {
                 java.nio.file.Files.createDirectories(uploadPath);
             }
 
-            
+            // Generate unique filename with proper validation
             String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || !originalFilename.contains(".")) {
+                throw new RuntimeException("Invalid filename: " + originalFilename);
+            }
+            
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String filename = java.util.UUID.randomUUID().toString() + extension;
             
-            
+            // Save file
             java.nio.file.Path filePath = uploadPath.resolve(filename);
             java.nio.file.Files.copy(file.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             
+            // Determine media type with better validation
+            String contentType = file.getContentType();
+            String mediaType = "image"; // default
+            if (contentType != null && contentType.startsWith("video/")) {
+                mediaType = "video";
+            }
             
-            String mediaType = file.getContentType().startsWith("video/") ? "video" : "image";
+            System.out.println("Successfully stored file: " + filename + " as " + mediaType + " (content-type: " + contentType + ")");
             
-            
+            // Return result
             Map<String, String> result = new HashMap<>();
             result.put("url", "http://localhost:8080/uploads/" + filename);
             result.put("mediaType", mediaType);
             return result;
             
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store file locally", e);
+        } catch (Exception e) {
+            System.err.println("Failed to store file locally: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to store file locally: " + e.getMessage(), e);
         }
     }
 

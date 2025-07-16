@@ -32,11 +32,13 @@ const TopicPostCard = React.memo(({ post, onInteraction }) => {
                 <div className="relative rounded-lg overflow-hidden border border-zinc-700/60 bg-zinc-900 mb-4 aspect-video">
                     {post.mediaType === 'video' ? (
                         <video
-                            src={post.imageUrl}
                             className="w-full h-full object-cover"
-                            muted // Muted for preview
-                            loop // Loop for preview
-                        />
+                            muted
+                            loop
+                            preload="metadata"
+                            src={post.imageUrl}
+                        >
+                        </video>
                     ) : (
                         <img
                             src={post.imageUrl}

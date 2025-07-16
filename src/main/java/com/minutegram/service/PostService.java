@@ -53,7 +53,7 @@ public class PostService {
         return post;
     }
 
-    public PostResponseDto createPost(PostCreateDto postDto, String imageUrl) {
+    public PostResponseDto createPost(PostCreateDto postDto, String imageUrl, String mediaType) {
         validatePostInput(postDto);
 
         Topic topic = topicRepository.findByName(postDto.getTopicName())
@@ -61,7 +61,6 @@ public class PostService {
 
         User currentUser = userService.getCurrentUser();
 
-        String mediaType = null;
         Post post = createPostEntity(postDto, imageUrl, mediaType, topic, currentUser);
         Post savedPost = postRepository.save(post);
 

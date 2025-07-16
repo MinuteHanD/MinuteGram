@@ -12,6 +12,30 @@ const PostCard = ({ post }) => {
       onClick={() => navigate(`/posts/${post.id}`)}
     >
       <h3 className="text-xl font-bold text-primary-content mb-2 truncate">{post.title}</h3>
+      
+      {/* Media Display */}
+      {post.imageUrl && (
+        <div className="mb-4 rounded-lg overflow-hidden border border-zinc-700/60">
+          {post.mediaType === 'video' ? (
+            <video 
+              controls 
+              className="w-full max-h-48 object-cover"
+              preload="metadata"
+              onClick={(e) => e.stopPropagation()}
+              src={post.imageUrl}
+            >
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img 
+              src={post.imageUrl} 
+              alt={post.title} 
+              className="w-full max-h-48 object-cover"
+            />
+          )}
+        </div>
+      )}
+      
       <p className="text-base-content/70 line-clamp-2 mb-4">{post.content}</p>
       <div className="flex justify-between items-center text-sm text-base-content/50 border-t border-base-300 pt-4">
         <div className="flex items-center gap-2">

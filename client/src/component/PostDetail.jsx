@@ -373,7 +373,15 @@ const PostDetail = () => {
                 {post.imageUrl && (
                     <div className="rounded-lg overflow-hidden border border-zinc-700/60 shadow-lg aspect-video max-h-[600px] flex items-center justify-center bg-black">
                         {post.mediaType === 'video' ? (
-                            <video controls src={post.imageUrl} className="w-full h-full object-contain" />
+                            <video 
+                                controls 
+                                className="w-full h-full object-contain"
+                                preload="metadata"
+                                crossOrigin="anonymous"
+                                src={post.imageUrl}
+                            >
+                                Your browser does not support the video tag.
+                            </video>
                         ) : (
                             <img src={post.imageUrl} alt={post.title} className="w-full h-full object-contain" />
                         )}

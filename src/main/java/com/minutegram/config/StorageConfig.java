@@ -20,6 +20,8 @@ public class StorageConfig implements WebMvcConfigurer {
         String uploadAbsolutePath = uploadPath.toFile().getAbsolutePath();
 
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadAbsolutePath + "/");
+                .addResourceLocations("file:" + uploadAbsolutePath + "/")
+                .setCachePeriod(3600)
+                .resourceChain(true);
     }
 }

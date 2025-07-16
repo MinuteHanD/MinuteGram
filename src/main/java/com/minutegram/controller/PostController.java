@@ -55,13 +55,15 @@ public class PostController {
         PostCreateDto postDto = objectMapper.readValue(postJson, PostCreateDto.class);
 
         String imageUrl = null;
+        String mediaType = null;
         if (image != null && !image.isEmpty()) {
             Map<String, String> uploadResult = storageService.store(image);
             imageUrl = uploadResult.get("url");
-            // mediaType is set in the service now
+            mediaType = uploadResult.get("mediaType");
+            System.out.println("Upload result - URL: " + imageUrl + ", MediaType: " + mediaType);
         }
         
-        PostResponseDto responseDto = postService.createPost(postDto, imageUrl);
+        PostResponseDto responseDto = postService.createPost(postDto, imageUrl, mediaType);
         return ResponseEntity.ok(responseDto);
     }
 
