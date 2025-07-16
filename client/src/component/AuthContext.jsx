@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
           });
         } catch (error) {
           // If the token is invalid or expired, clean up and treat as logged out.
-          console.error("Auth token validation failed", error);
+          console.warn("Auth token validation failed - user will be logged out", error.response?.status);
           localStorage.removeItem('token');
           setUser(null);
         }

@@ -17,6 +17,48 @@ import {
 } from 'lucide-react';
 import Notification from './Notification';
 import CommentForm from './CommentForm';
+
+// Reply Form Component
+const ReplyForm = ({ onReplySubmit, onCancel, isSubmitting }) => {
+  const [replyContent, setReplyContent] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!replyContent.trim() || isSubmitting) return;
+    
+    await onReplySubmit(replyContent);
+    setReplyContent('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-700/60">
+      <textarea
+        value={replyContent}
+        onChange={(e) => setReplyContent(e.target.value)}
+        placeholder="Write your reply..."
+        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-3 text-zinc-200 placeholder-zinc-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 resize-none"
+        rows="3"
+      />
+      <div className="flex justify-end gap-2 mt-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={!replyContent.trim() || isSubmitting}
+          className="px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+        >
+          {isSubmitting ? 'Posting...' : 'Reply'}
+          <Send className="w-4 h-4" />
+        </button>
+      </div>
+    </form>
+  );
+};
 import { ModernCard, ModernButton, ModernIconButton } from './Utopia';
 
 // Skeleton Loader for Post Details
@@ -100,6 +142,8 @@ const PostDetail = () => {
   useEffect(() => {
     fetchPostDetails();
   }, [fetchPostDetails]);
+
+  const fetchPostData = fetchPostDetails; // Alias for use in CommentCard
 
   const handleAddComment = async (commentContent) => {
     if (!token) {
@@ -206,24 +250,81 @@ const PostDetail = () => {
     );
   }
   
-  // Comment Card Component - streamlined and visually distinct
-  const CommentCard = React.memo(({ comment }) => (
-    <div className="flex items-start gap-4 p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/60 shadow-inner">
-        <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0">
-            <User className="w-6 h-6 text-teal-400" />
-        </div>
-        <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-zinc-200 text-base">@{comment.authorName}</span>
-                <span className="text-xs text-zinc-500">â€¢</span>
-                <span className="text-xs text-zinc-500">
-                    {new Date(comment.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
+  // Comment Card Component - streamlined and visually distinct with reply support
+  const CommentCard = React.memo(({ comment, isReply = false }) => {
+    const [showReplyForm, setShowReplyForm] = useState(false);
+    const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+
+    const handleReply = async (replyContent) => {
+      setIsSubmittingReply(true);
+      try {
+        await api.post('/comments', {
+          content: replyContent,
+          postId: parseInt(postId),
+          parentCommentId: comment.id
+        });
+        setNotification({ message: 'Reply added successfully!', type: 'success' });
+        setShowReplyForm(false);
+        await fetchPostDetails(); // Refresh comments to show the new reply
+      } catch (err) {
+        console.error('Failed to add reply:', err);
+        setNotification({ message: 'Failed to add reply.', type: 'error' });
+      } finally {
+        setIsSubmittingReply(false);
+      }
+    };
+
+    return (
+      <div className={`${isReply ? 'ml-8 border-l-2 border-teal-500/30 pl-4' : ''}`}>
+        <div className="flex items-start gap-4 p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/60 shadow-inner">
+            <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0">
+                <User className="w-6 h-6 text-teal-400" />
             </div>
-            <p className="text-zinc-300 leading-relaxed text-sm mt-1">{comment.content}</p>
+            <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-zinc-200 text-base">@{comment.authorName}</span>
+                    <span className="text-xs text-zinc-500">•</span>
+                    <span className="text-xs text-zinc-500">
+                        {new Date(comment.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                </div>
+                <p className="text-zinc-300 leading-relaxed text-sm mt-1">{comment.content}</p>
+                
+                {/* Reply button - only show for authenticated users and not for replies */}
+                {token && !isReply && (
+                  <button
+                    onClick={() => setShowReplyForm(!showReplyForm)}
+                    className="mt-3 text-teal-400 hover:text-teal-300 text-sm font-medium transition-colors duration-200 flex items-center gap-1"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Reply
+                  </button>
+                )}
+            </div>
         </div>
-    </div>
-  ));
+
+        {/* Reply Form */}
+        {showReplyForm && (
+          <div className="mt-4 ml-4">
+            <ReplyForm 
+              onReplySubmit={handleReply} 
+              onCancel={() => setShowReplyForm(false)}
+              isSubmitting={isSubmittingReply}
+            />
+          </div>
+        )}
+
+        {/* Nested Replies */}
+        {comment.replies && comment.replies.length > 0 && (
+          <div className="mt-4 space-y-4">
+            {comment.replies.map(reply => (
+              <CommentCard key={reply.id} comment={reply} isReply={true} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 font-sans">
