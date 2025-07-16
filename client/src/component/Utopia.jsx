@@ -2,7 +2,7 @@ import React from 'react';
 
 export const ModernCard = React.memo(({ children, className = '', ...props }) => (
     <div
-      className={`bg-zinc-900/60 backdrop-blur-lg border border-zinc-700/70 rounded-2xl shadow-xl shadow-black/30 ${className}`}
+      className={`bg-base-200 border border-base-300 rounded-lg shadow-md ${className}`}
       {...props}
     >
       {children}
@@ -19,18 +19,18 @@ export const ModernCard = React.memo(({ children, className = '', ...props }) =>
     onClick,
     ...props 
   }) => {
-    const baseStyles = 'rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-98';
+    const baseStyles = 'rounded-md font-semibold transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
     const variants = {
-      primary: 'bg-gradient-to-br from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white shadow-lg shadow-teal-500/20',
-      secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
-      ghost: 'hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-100',
-      danger: 'bg-red-600 hover:bg-red-500 text-white',
-      outline: 'border border-teal-500 text-teal-400 hover:bg-teal-500/10'
+      primary: 'bg-primary hover:bg-primary-focus text-primary-content',
+      secondary: 'bg-secondary hover:bg-secondary-focus text-secondary-content',
+      ghost: 'hover:bg-base-300 text-base-content',
+      danger: 'bg-error hover:bg-error/80 text-white',
+      outline: 'border border-primary text-primary hover:bg-primary/10'
     };
     const sizes = {
       sm: 'px-3 py-1.5 text-sm',
-      md: 'px-5 py-2.5',
-      lg: 'px-7 py-3 text-lg'
+      md: 'px-4 py-2',
+      lg: 'px-6 py-3 text-lg'
     };
     
     return (
@@ -48,22 +48,22 @@ export const ModernCard = React.memo(({ children, className = '', ...props }) =>
   
   export const ModernIconButton = React.memo(({ icon: Icon, label, active = false, onClick, className = '', ...props }) => (
     <button
-      className={`p-2.5 rounded-lg group ${active ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20' : 'hover:bg-zinc-800/70 text-zinc-400 hover:text-zinc-100'} transition-all flex items-center justify-center gap-2`}
+      className={`p-2 rounded-md group ${active ? 'bg-primary text-primary-content' : 'hover:bg-base-300 text-base-content'} transition-all flex items-center justify-center gap-2`}
       onClick={onClick}
       {...props}
     >
-      <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-100'}`} />
+      <Icon className={`w-5 h-5 ${active ? 'text-primary-content' : 'text-base-content group-hover:text-primary-content'}`} />
       {label && <span className="text-sm font-medium">{label}</span>}
     </button>
   ));
   
   export const ModernInput = React.memo(({ label, id, type = 'text', className = '', ...props }) => (
     <div className="space-y-1">
-      {label && <label htmlFor={id} className="block text-sm font-medium text-zinc-400">{label}</label>}
+      {label && <label htmlFor={id} className="block text-sm font-medium text-base-content/80">{label}</label>}
       <input
         id={id}
         type={type}
-        className={`w-full p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors duration-200 ${className}`}
+        className={`w-full p-2 rounded-md bg-base-200 border border-base-300 text-base-content focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors duration-200 ${className}`}
         {...props}
       />
     </div>
@@ -71,11 +71,11 @@ export const ModernCard = React.memo(({ children, className = '', ...props }) =>
   
   export const ModernTextarea = React.memo(({ label, id, className = '', ...props }) => (
     <div className="space-y-1">
-      {label && <label htmlFor={id} className="block text-sm font-medium text-zinc-400">{label}</label>}
+      {label && <label htmlFor={id} className="block text-sm font-medium text-base-content/80">{label}</label>}
       <textarea
         id={id}
         rows="4"
-        className={`w-full p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none resize-y transition-colors duration-200 ${className}`}
+        className={`w-full p-2 rounded-md bg-base-200 border border-base-300 text-base-content focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-y transition-colors duration-200 ${className}`}
         {...props}
       ></textarea>
     </div>

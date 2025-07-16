@@ -1,20 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-zinc-950 text-dark-400 font-sans m-0 h-full w-full;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-base-100 text-base-content font-sans antialiased;
+  }
 }
 
-
-::-webkit-scrollbar {
-  @apply w-2 bg-dark-100;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-dark-300 rounded-full;
-}
 
 
