@@ -6,92 +6,8 @@ import {
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, 
   Clock, TrendingUp, Sparkles, Send, Image as ImageIcon, Video, Link, Eye, User, Calendar
 } from 'lucide-react';
-
-// Reusable Components - keeping these separate because, like, modularity. It's important.
-// Updated Card with a more defined border and subtle gradient
-const ModernCard = React.memo(({ children, className = '', ...props }) => (
-  <div 
-    className={`bg-zinc-900/60 backdrop-blur-lg border border-zinc-700/70 rounded-2xl shadow-xl shadow-black/30 ${className}`}
-    {...props}
-  >
-    {children}
-  </div>
-));
-
-// Updated Button with more subtle hover and active states for consistency with the new design
-const ModernButton = React.memo(({ 
-  children, 
-  variant = 'primary', 
-  className = '', 
-  type = 'button',
-  disabled = false,
-  size = 'md',
-  onClick,
-  ...props 
-}) => {
-  const baseStyles = 'rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-98';
-  const variants = {
-    primary: 'bg-gradient-to-br from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white shadow-lg shadow-teal-500/20',
-    secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700',
-    ghost: 'hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-100',
-    danger: 'bg-red-600 hover:bg-red-500 text-white',
-    outline: 'border border-teal-500 text-teal-400 hover:bg-teal-500/10'
-  };
-  const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-5 py-2.5',
-    lg: 'px-7 py-3 text-lg'
-  };
-  
-  return (
-    <button 
-      type={type} 
-      disabled={disabled} 
-      onClick={onClick}
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} 
-      {...props}
-    >
-      {children}
-    </button>
-  );
-});
-
-// Updated IconButton for better visual feedback
-const ModernIconButton = React.memo(({ icon: Icon, label, active = false, onClick, className = '', ...props }) => (
-  <button
-    className={`p-2.5 rounded-lg group ${active ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20' : 'hover:bg-zinc-800/70 text-zinc-400 hover:text-zinc-100'} transition-all flex items-center justify-center gap-2`}
-    onClick={onClick}
-    {...props}
-  >
-    <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-100'}`} />
-    {label && <span className="text-sm font-medium">{label}</span>}
-  </button>
-));
-
-// Input and Textarea components for consistent styling
-const ModernInput = React.memo(({ label, id, type = 'text', className = '', ...props }) => (
-  <div className="space-y-1">
-    {label && <label htmlFor={id} className="block text-sm font-medium text-zinc-400">{label}</label>}
-    <input
-      id={id}
-      type={type}
-      className={`w-full p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors duration-200 ${className}`}
-      {...props}
-    />
-  </div>
-));
-
-const ModernTextarea = React.memo(({ label, id, className = '', ...props }) => (
-  <div className="space-y-1">
-    {label && <label htmlFor={id} className="block text-sm font-medium text-zinc-400">{label}</label>}
-    <textarea
-      id={id}
-      rows="4"
-      className={`w-full p-3 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none resize-y transition-colors duration-200 ${className}`}
-      {...props}
-    ></textarea>
-  </div>
-));
+import Notification from './Notification'; // Import the Notification component
+import { ModernCard, ModernButton, ModernIconButton, ModernInput, ModernTextarea } from './Utopia';
 
 // Post Card for this page - simplified and more focused
 const TopicPostCard = React.memo(({ post, onInteraction }) => {
@@ -230,9 +146,12 @@ export const TopicPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [sortBy, setSortBy] = useState('newest'); // Default to 'newest'
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [notification, setNotification] = useState({ message: '', type: '' });
 
     const fetchTopicDetails = useCallback(async () => {
         setIsLoading(true);
+        setError(null);
         try {
             const response = await api.get(`/topics/${topicId}/details`, {
                 params: {
@@ -243,11 +162,17 @@ export const TopicPage = () => {
             setPosts(response.data.posts.content);
         } catch (err) {
             console.error('Failed to fetch topic details:', err);
-            alert('Ugh, failed to fetch topic details. So annoying.');
+            setError('Failed to fetch topic details. Please try again later.');
         } finally {
             setIsLoading(false);
         }
     }, [topicId, sortBy]);
+
+    useEffect(() => {
+        if (topic) {
+            document.title = `${topic.name} - MinuteGram`;
+        }
+    }, [topic]);
 
     useEffect(() => {
         fetchTopicDetails();
@@ -295,9 +220,10 @@ export const TopicPage = () => {
                 setMediaPreview(null);
             }
             fetchTopicDetails();
+            setNotification({ message: 'Post created successfully!', type: 'success' });
         } catch (err) {
             console.error('Failed to create post:', err);
-            alert('Failed to create post. This is so not fetch.');
+            setNotification({ message: 'Failed to create post. Please try again.', type: 'error' });
         } finally {
             setIsSubmitting(false);
         }
@@ -320,6 +246,11 @@ export const TopicPage = () => {
     
     return (
         <div className="relative min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 font-sans">
+            <Notification 
+                message={notification.message} 
+                type={notification.type} 
+                onClose={() => setNotification({ message: '', type: '' })} 
+            />
             {/* Background Gradient & Effects from Homepage */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-900/10 via-transparent to-transparent -z-10"></div>
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-900/5 via-transparent to-transparent -z-10"></div>
@@ -511,6 +442,12 @@ export const TopicPage = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {Array(6).fill(0).map((_, i) => <PostSkeleton key={i} />)}
                         </div>
+                    ) : error ? (
+                        <ModernCard className="py-20 text-center flex flex-col items-center justify-center">
+                            <XCircle className="w-16 h-16 text-red-500 mb-4" />
+                            <h3 className="text-2xl font-bold text-white mb-2">Error</h3>
+                            <p className="text-zinc-400">{error}</p>
+                        </ModernCard>
                     ) : posts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {posts.map(post => <TopicPostCard key={post.id} post={post} onInteraction={handlePostInteraction} />)}

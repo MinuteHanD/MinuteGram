@@ -1,15 +1,16 @@
-// Home.js - COMPLETELY REDESIGNED
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
 import { Shield, Plus, MessageSquare, X, Search, Settings, Bell, Bookmark, TrendingUp, Clock, Users, Code, Star, ChevronRight, Zap, Activity, Eye, Heart, ArrowUpRight, Sparkles, Globe, Flame } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import PostCard from './PostCard'; // Import the new PostCard component
 
 const Home = () => {
   // States for THIS component's data and UI
   const [topics, setTopics] = useState([]);
   const [topicsLoading, setTopicsLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
   const [newTopicDescription, setNewTopicDescription] = useState('');
@@ -31,6 +32,18 @@ const Home = () => {
     }
   };
 
+  const fetchRecentPosts = async () => {
+    setPostsLoading(true);
+    try {
+      const response = await api.get('/posts?size=6'); // Fetch 6 recent posts
+      setPosts(response.data.content);
+    } catch (err) {
+      console.error("Failed to fetch recent posts:", err);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
   const createTopic = async () => {
     if (!newTopicName.trim()) return;
     try {
@@ -49,6 +62,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchTopics();
+    fetchRecentPosts();
   }, []);
 
   const filteredTopics = useMemo(() => 
@@ -346,7 +360,22 @@ const Home = () => {
             </div>
           </div>
 
+          {/* Recent Posts Section */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-white mb-6">Recent Posts</h2>
+            {postsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(3)].map((_, i) => <div key={i}>{renderTopicSkeleton()}</div>)}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {posts.map((post) => <PostCard key={post.id} post={post} />)}
+              </div>
+            )}
+          </div>
+
           {/* Topics grid with enhanced loading and content states */}
+          <h2 className="text-2xl font-bold text-white mb-6">Topics</h2>
           {topicsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => 
