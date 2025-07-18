@@ -58,6 +58,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/topics/{id}/details").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll();
                     auth.requestMatchers(HttpMethod.HEAD, "/api/topics/**").permitAll();
 

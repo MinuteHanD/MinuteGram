@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../service/apiClient';
 import { 
   MessageSquare, FileText, Plus, X, Upload, 
-  Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, 
+  Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, XCircle,
   Clock, TrendingUp, Sparkles, Send, Image as ImageIcon, Video, Link, Eye, User, Calendar
 } from 'lucide-react';
 import Notification from './Notification'; // Import the Notification component
