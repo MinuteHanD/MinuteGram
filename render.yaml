@@ -4,12 +4,6 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: DB_URL
-        value: jdbc:postgresql://minutegram-1.ctgywowyq4cc.ap-south-1.rds.amazonaws.com:5432/postgres
-      - key: DB_USERNAME
-        value: amritanshu
-      - key: DB_PASSWORD
-        value: X4OjquYRaHbkLQj2j45B
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION
