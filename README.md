@@ -35,10 +35,14 @@ docker-compose up
 
 ## Deployment
 
-### Backend (Railway)
-1. Connect GitHub repo to Railway
-2. Add environment variables from `.env.production`
-3. Deploy automatically
+### Backend (Render)
+1. Go to render.com and connect GitHub repo
+2. Choose "Web Service"
+3. Use these settings:
+   - Environment: `Docker`
+   - Dockerfile Path: `./Dockerfile`
+4. Environment variables will be auto-configured from render.yaml
+5. Uses AWS RDS PostgreSQL database
 
 ### Frontend (Vercel)
 1. Connect GitHub repo to Vercel
