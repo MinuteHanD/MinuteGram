@@ -30,6 +30,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "build:prod": "vite build --config vite.config.production.js"
   }
 }
