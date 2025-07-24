@@ -34,8 +34,20 @@ build/
 
 ### ENV FILE ###
 .env
+.env.local
+.env.production
+
+### Node modules ###
+client/node_modules/
+client/dist/
+
+### Docker ###
+postgres_data/
 env.sh
 repomix-output.txt
 ### React ###
 node_modules
 repomix-output.xml
+
+frontend.log
+backend.log

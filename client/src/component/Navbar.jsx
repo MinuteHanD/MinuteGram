@@ -1,204 +1,162 @@
-// src/components/Navbar.js
 import React, { useState, useEffect } from 'react';
-import { Menu, X, LogIn, UserPlus, Bell, User, Settings, LogOut, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { LogIn, UserPlus, User, LogOut, Shield, Settings, Sun, Moon, Menu, X } from 'lucide-react';
 
-const links = [
-  { name: 'Home', to: '/' },
-  { name: 'Explore', to: '/explore' },
-  { name: 'About', to: '/about' },
-];
+const NavLink = ({ to, children }) => (
+  <Link to={to} className="px-3 py-2 rounded-md text-sm font-medium text-base-content hover:bg-base-200 hover:text-primary-content transition-colors">
+    {children}
+  </Link>
+);
 
-export default function Navbar() {
+const MobileNavLink = ({ to, children, onClick }) => (
+  <Link to={to} onClick={onClick} className="block px-3 py-2 rounded-md text-base font-medium text-base-content hover:bg-base-200 hover:text-primary-content">
+    {children}
+  </Link>
+);
+
+const Navbar = ({ darkMode, toggleDarkMode }) => {
+  const { isAuthenticated, user, logout, isAdmin, isModerator } = useAuth();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout, isAdmin, isModerator } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLogout = () => {
     logout();
-    setOpen(false);
     navigate('/');
+    setIsOpen(false);
   };
 
-  const renderDashboard = () => {
-    if (!isAuthenticated) return null;
-    if (isAdmin) return { name: 'Admin', to: '/admin', icon: Shield };
-    if (isModerator) return { name: 'Mod', to: '/moderation', icon: Shield };
+  const getDashboardLink = () => {
+    if (isAdmin) return { to: '/admin', label: 'Admin Panel' };
+    if (isModerator) return { to: '/moderation', label: 'Moderator Panel' };
     return null;
   };
 
-  const dash = renderDashboard();
+  const dashboardLink = getDashboardLink();
 
   return (
-    <header
-      className={`fixed w-full top-0 z-50 transition ${
-        scrolled ? 'backdrop-blur-xl bg-white/10' : 'backdrop-blur-md bg-white/5'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-        {/* Brand as plain text */}
-        <h1
-          onClick={() => navigate('/')}
-          className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-cyan-300 cursor-pointer"
-        >
-          Minutegram
-        </h1>
-
-        {/* Desktop Links */}
-        <nav className="hidden md:flex space-x-8">
-          {links.map((l) => (
-            <button
-              key={l.to}
-              onClick={() => navigate(l.to)}
-              className="relative text-white hover:text-teal-300 transition"
-            >
-              {l.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-300 transition-all group-hover:w-full"></span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Auth / Icons */}
-        <div className="hidden md:flex items-center space-x-4">
-          {isAuthenticated ? (
-            <>
-              <button className="p-2 hover:text-teal-300 transition relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-0 right-0 block w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-
-              <div className="relative group">
-                <button className="px-3 py-1 bg-white/10 rounded-full flex items-center space-x-2 hover:bg-white/20 transition">
-                  <span className="font-semibold text-white">
-                    {user?.name?.split(' ')[0] || 'User'}
-                  </span>
-                </button>
-
-                <div className="absolute right-0 mt-2 w-40 bg-white/10 backdrop-blur-lg rounded-lg overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
-                  {dash && (
-                    <button
-                      onClick={() => navigate(dash.to)}
-                      className="w-full text-left px-4 py-2 hover:bg-white/20 flex items-center space-x-2"
-                    >
-                      <dash.icon className="w-4 h-4 text-cyan-300" />
-                      <span className="text-white">{dash.name}</span>
-                    </button>
-                  )}
-                  <button
-                    onClick={() => { navigate('/settings'); }}
-                    className="w-full text-left px-4 py-2 hover:bg-white/20 flex items-center space-x-2"
-                  >
-                    <Settings className="w-4 h-4 text-cyan-300" />
-                    <span className="text-white">Settings</span>
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-white/20 flex items-center space-x-2"
-                  >
-                    <LogOut className="w-4 h-4 text-red-400" />
-                    <span className="text-red-400">Logout</span>
-                  </button>
-                </div>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-base-200/80 backdrop-blur-lg border-b border-base-300' : 'bg-transparent'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="flex-shrink-0 text-2xl font-bold text-primary">
+              MinuteGram
+            </Link>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-4">
+                <NavLink to="/">Home</NavLink>
+                {dashboardLink && <NavLink to={dashboardLink.to}>{dashboardLink.label}</NavLink>}
               </div>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => navigate('/login')}
-                className="flex items-center space-x-1 text-white hover:text-teal-300 transition"
-              >
-                <LogIn className="w-5 h-5" />
-                <span>Login</span>
+            </div>
+          </div>
+          <div className="hidden md:block">
+            <div className="ml-4 flex items-center md:ml-6">
+              <button onClick={toggleDarkMode} className="p-1 rounded-full text-base-content hover:text-primary-content hover:bg-base-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-primary">
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              <button
-                onClick={() => navigate('/signup')}
-                className="flex items-center space-x-1 text-white hover:text-teal-300 transition"
-              >
-                <UserPlus className="w-5 h-5" />
-                <span>Sign Up</span>
-              </button>
-            </>
-          )}
+              {isAuthenticated ? (
+                <div className="ml-3 relative">
+                  <div>
+                    <button onClick={() => setIsOpen(!isOpen)} className="max-w-xs bg-base-200 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-primary" id="user-menu" aria-haspopup="true">
+                      <span className="sr-only">Open user menu</span>
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </div>
+                    </button>
+                  </div>
+                  {isOpen && (
+                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-base-200 ring-1 ring-black ring-opacity-5">
+                      <div className="px-4 py-2 border-b border-base-300">
+                        <p className="text-sm text-base-content">Signed in as</p>
+                        <p className="text-sm font-medium text-primary-content truncate">{user?.name}</p>
+                      </div>
+                      <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center px-4 py-2 text-sm text-base-content hover:bg-base-300"><User size={16} className="mr-2"/>Profile</Link>
+                      <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-sm text-error hover:bg-base-300"><LogOut size={16} className="mr-2"/>Sign out</button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Link to="/login" className="px-3 py-2 rounded-md text-sm font-medium text-base-content hover:bg-base-200">
+                    <LogIn className="inline-block w-4 h-4 mr-1" />
+                    Login
+                  </Link>
+                  <Link to="/signup" className="px-3 py-2 rounded-md text-sm font-medium bg-primary text-primary-content hover:bg-primary-focus">
+                    <UserPlus className="inline-block w-4 h-4 mr-1" />
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="-mr-2 flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="bg-base-200 inline-flex items-center justify-center p-2 rounded-md text-base-content hover:text-primary-content hover:bg-base-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-base-100 focus:ring-primary">
+              <span className="sr-only">Open main menu</span>
+              {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+            </button>
+          </div>
         </div>
-
-        {/* Mobile Toggle */}
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="md:hidden text-white"
-        >
-          {open ? <X size={28} /> : <Menu size={28} />}
-        </button>
       </div>
 
-      {/* Mobile Menu */}
-      {open && (
-        <div className="md:hidden bg-white/10 backdrop-blur-xl px-6 py-4 space-y-4">
-          {links.map((l) => (
-            <button
-              key={l.to}
-              onClick={() => { navigate(l.to); setOpen(false); }}
-              className="block w-full text-left text-white py-2 hover:text-teal-300 transition"
-            >
-              {l.name}
-            </button>
-          ))}
-
-          <div className="border-t border-white/20"></div>
-
-          {isAuthenticated ? (
-            <>
-              {dash && (
-                <button
-                  onClick={() => { navigate(dash.to); setOpen(false); }}
-                  className="flex items-center w-full space-x-2 text-white py-2 hover:text-teal-300 transition"
-                >
-                  <dash.icon className="w-5 h-5" />
-                  <span>{dash.name}</span>
+      {isOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <MobileNavLink to="/" onClick={() => setIsOpen(false)}>Home</MobileNavLink>
+            {dashboardLink && <MobileNavLink to={dashboardLink.to} onClick={() => setIsOpen(false)}>{dashboardLink.label}</MobileNavLink>}
+          </div>
+          <div className="pt-4 pb-3 border-t border-base-300">
+            {isAuthenticated ? (
+              <div className="px-2 space-y-1">
+                <div className="flex items-center px-3 mb-2">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-base font-medium leading-none text-primary-content">{user?.name}</div>
+                    <div className="text-sm font-medium leading-none text-base-content">{user?.email}</div>
+                  </div>
+                </div>
+                <MobileNavLink to="/profile" onClick={() => setIsOpen(false)}>
+                  <User size={16} className="inline-block mr-2"/>Your Profile
+                </MobileNavLink>
+                <button onClick={handleLogout} className="w-full text-left flex items-center px-3 py-2 rounded-md text-base font-medium text-error hover:bg-base-200">
+                  <LogOut size={16} className="inline-block mr-2"/>Sign out
                 </button>
-              )}
-              <button
-                onClick={() => { navigate('/settings'); setOpen(false); }}
-                className="flex items-center w-full space-x-2 text-white py-2 hover:text-teal-300 transition"
-              >
-                <Settings className="w-5 h-5" />
-                <span>Settings</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full space-x-2 text-red-400 py-2 hover:bg-red-500/10 rounded transition"
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Logout</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => { navigate('/login'); setOpen(false); }}
-                className="flex items-center w-full space-x-2 text-white py-2 hover:text-teal-300 transition"
-              >
-                <LogIn className="w-5 h-5" />
-                <span>Login</span>
-              </button>
-              <button
-                onClick={() => { navigate('/signup'); setOpen(false); }}
-                className="flex items-center w-full space-x-2 text-white py-2 hover:text-teal-300 transition"
-              >
-                <UserPlus className="w-5 h-5" />
-                <span>Sign Up</span>
-              </button>
-            </>
-          )}
+              </div>
+            ) : (
+              <div className="px-2 space-y-1">
+                <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
+                  <LogIn className="inline-block w-4 h-4 mr-1" />
+                  Login
+                </MobileNavLink>
+                <MobileNavLink to="/signup" onClick={() => setIsOpen(false)}>
+                  <UserPlus className="inline-block w-4 h-4 mr-1" />
+                  Sign Up
+                </MobileNavLink>
+              </div>
+            )}
+             <div className="mt-3 px-2">
+                <button onClick={toggleDarkMode} className="w-full flex justify-between items-center px-3 py-2 rounded-md text-base font-medium text-base-content hover:bg-base-200">
+                  <span>Toggle Theme</span>
+                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+              </div>
+          </div>
         </div>
       )}
-    </header>
+    </nav>
   );
-}
+};
+
+export default Navbar;

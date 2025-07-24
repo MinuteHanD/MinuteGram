@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: minutegram-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 86400000
+      - key: SERVER_PORT
+        value: 8080
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dbly83gww
+      - key: CLOUDINARY_API_KEY
+        value: 647556499282971
+      - key: CLOUDINARY_API_SECRET
+        value: rpI4KUStL-dAjQVOrb2G7h-FKxQ

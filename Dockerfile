@@ -1,22 +1,34 @@
-# Importing JDK and copying required files
-FROM openjdk:17 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src src
 
-# Copy Maven wrapper
+# Stage 1: Build the application
+FROM openjdk:17-jdk-slim AS build
+WORKDIR /app
+
+# Copy Maven wrapper and pom.xml
 COPY mvnw .
 COPY .mvn .mvn
+COPY pom.xml .
 
-# Set execution permission for the Maven wrapper
+# Set execution permission for Maven wrapper
 RUN chmod +x ./mvnw
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY src src
+
+# Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Stage 2: Create the final Docker image using OpenJDK 19
-FROM openjdk:17-jdk
-VOLUME /tmp
+# Stage 2: Create the runtime image
+FROM openjdk:17-jdk-slim
+WORKDIR /app
 
-# Copy the JAR from the build stage
+# Copy the JAR from build stage
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+
+# Expose port
 EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -35,6 +35,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({});
   const [overTimeData, setOverTimeData] = useState([]);
   const [rolesData, setRolesData] = useState([]);
+  const [confirmDialog, setConfirmDialog] = useState({ show: false, message: '', onConfirm: null });
   
   const [posts, setPosts] = useState([]);
   const [postsPage, setPostsPage] = useState(0);
@@ -167,40 +168,49 @@ const AdminDashboard = () => {
   };
 
   
+  const showConfirmDialog = (message, onConfirm) => {
+    console.log('showConfirmDialog called with:', message);
+    setConfirmDialog({ show: true, message, onConfirm });
+  };
+
   const handleDeletePost = async (postId) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
-    try {
-      await api.delete(`/admin/posts/${postId}`);
-      fetchPosts(postsPage, 10, postsSearch);
-      alert('Post deleted successfully');
-    } catch (err) {
-      console.error('Failed to delete post:', err);
-      alert('Failed to delete post');
-    }
+    console.log('handleDeletePost called with postId:', postId);
+    showConfirmDialog('Are you sure you want to delete this post?', async () => {
+      try {
+        await api.delete(`/admin/posts/${postId}`);
+        fetchPosts(postsPage, 10, postsSearch);
+        alert('Post deleted successfully');
+      } catch (err) {
+        console.error('Failed to delete post:', err);
+        alert('Failed to delete post');
+      }
+    });
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) return;
-    try {
-      await api.delete(`/admin/comments/${commentId}`);
-      fetchComments(commentsPage, 10, commentsSearch);
-      alert('Comment deleted successfully');
-    } catch (err) {
-      console.error('Failed to delete comment:', err);
-      alert('Failed to delete comment');
-    }
+    showConfirmDialog('Are you sure you want to delete this comment?', async () => {
+      try {
+        await api.delete(`/admin/comments/${commentId}`);
+        fetchComments(commentsPage, 10, commentsSearch);
+        alert('Comment deleted successfully');
+      } catch (err) {
+        console.error('Failed to delete comment:', err);
+        alert('Failed to delete comment');
+      }
+    });
   };
 
   const handleDeleteTopic = async (topicId) => {
-    if (!window.confirm('Are you sure you want to delete this topic?')) return;
-    try {
-      await api.delete(`/admin/topics/${topicId}`);
-      fetchTopics(topicsPage, 10, topicsSearch);
-      alert('Topic deleted successfully');
-    } catch (err) {
-      console.error('Failed to delete topic:', err);
-      alert('Failed to delete topic');
-    }
+    showConfirmDialog('Are you sure you want to delete this topic?', async () => {
+      try {
+        await api.delete(`/admin/topics/${topicId}`);
+        fetchTopics(topicsPage, 10, topicsSearch);
+        alert('Topic deleted successfully');
+      } catch (err) {
+        console.error('Failed to delete topic:', err);
+        alert('Failed to delete topic');
+      }
+    });
   };
 
   const handleRoleChange = async (userId, newRole) => {
@@ -702,6 +712,34 @@ const AdminDashboard = () => {
           {activeView === 'topics' && renderTopicsView()}
           {activeView === 'users' && renderUsersView()}
         </div>
+
+        {/* Custom Confirmation Dialog */}
+        {console.log('confirmDialog state:', confirmDialog)}
+        {confirmDialog.show && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-zinc-900 rounded-xl border border-zinc-700 p-6 max-w-md w-full mx-4 shadow-2xl">
+              <h3 className="text-lg font-semibold text-white mb-4">Confirm Action</h3>
+              <p className="text-zinc-300 mb-6">{confirmDialog.message}</p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setConfirmDialog({ show: false, message: '', onConfirm: null })}
+                  className="px-4 py-2 bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    confirmDialog.onConfirm();
+                    setConfirmDialog({ show: false, message: '', onConfirm: null });
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
