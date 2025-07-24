@@ -283,7 +283,7 @@ const PostDetail = () => {
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold text-zinc-200 text-base">@{comment.authorName}</span>
-                    <span className="text-xs text-zinc-500">•</span>
+                    <span className="text-xs text-zinc-500">â€¢</span>
                     <span className="text-xs text-zinc-500">
                         {new Date(comment.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
@@ -389,7 +389,7 @@ const PostDetail = () => {
                 )}
 
                 {/* Post Content - Readable with good line height */}
-                <div className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap py-4">
+                <div className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap py-4 break-words">
                     {post.content}
                 </div>
                 
