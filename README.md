@@ -95,7 +95,7 @@
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/MinuteGram.git
+    git clone https://github.com/MinuteHanD/MinuteGram.git
     cd MinuteGram
     ```
 
