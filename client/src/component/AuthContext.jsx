@@ -52,7 +52,10 @@ export const AuthProvider = ({ children }) => {
         isAdmin: userData.roles.includes('ADMIN'),
         isModerator: userData.roles.includes('MODERATOR')
     });
-    navigate('/'); // Navigate after successful login
+    // Use setTimeout to ensure state update is processed before navigation
+    setTimeout(() => {
+      navigate('/');
+    }, 0);
   };
 
   const logout = () => {
