@@ -166,4 +166,8 @@ public class User {
     public String getPassword() {
         return password;
     }
+
+    public String getUsername() {
+        return username;
+    }
 }

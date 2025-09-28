@@ -1,142 +1,216 @@
 # MinuteGram
 
-**MinuteGram** is a modern social media platform built with Spring Boot and React. This is a full-stack development, built with robust RESTful API to creating a dynamic and responsive user interface.
+A full-stack scalable social media engine built with Spring Boot and React, featuring topic-based discussions, user authentication, and administrative controls with a mid design interface. I'd be happy to recieve all suggestions on that.
 
-## Core Features
+## Architecture
 
-*   **User Authentication:** Secure user registration and login with JWT-based authentication.
-*   **Topics:** Create and subscribe to topics of interest.
-*   **Posts:** Share text-based posts within topics, with support for image uploads.
-*   **Comments:** Engage in discussions through comments on posts.
-*   **User Profiles:** View and manage user profiles.
-*   **Admin & Moderator Roles:** User roles for content moderation and platform administration.
-*   **Cloud-based Image Storage:** Integration with Cloudinary for image uploads.
+### Backend (Spring Boot)
+- **Framework**: Spring Boot 3.3.1
+- **Language**: Java 17
+- **Database**: PostgreSQL with Spring Data JPA
+- **Security**: JWT-based authentication with Spring Security
+- **File Storage**: Cloudinary integration
+- **Testing**: JUnit 5, Mockito, TestContainers
 
-## Tech Stack
+### Frontend (React)
+- **Framework**: React 18 with Vite
+- **Styling**: Tailwind CSS
+- **Routing**: React Router DOM
+- **HTTP Client**: Axios
+- **State Management**: Context API
 
-**Backend:**
+### Infrastructure
+- **Containerization**: Docker & Docker Compose
+- **Database**: PostgreSQL 13
+- **Build Tools**: Maven (backend), Vite (frontend)
 
-*   **Framework:** Spring Boot
-*   **Language:** Java 17
-*   **Database:** PostgreSQL
-*   **Authentication:** Spring Security with JWT
-*   **ORM:** Spring Data JPA (Hibernate)
-*   **File Storage:** Cloudinary
+## Features
 
-**Frontend:**
+### Core Functionality
+- User registration and JWT authentication
+- Topic creation and management
+- Post creation with image upload support
+- Threaded comment system with replies
+- Post like/unlike functionality
+- User profile management
 
-*   **Framework:** React
-*   **Language:** JavaScript (ES6+)
-*   **Styling:** Tailwind CSS
-*   **Routing:** React Router
-*   **Build Tool:** Vite
-*   **API Client:** Axios
+### Administrative Features
+- Role-based access control (User, Moderator, Admin)
+- User management (ban/unban, role assignment)
+- Content moderation (post/comment deletion)
+- Administrative dashboard with analytics
 
-## API Endpoints
+### Security
+- JWT token-based authentication
+- Role-based authorization
+- CSRF protection
+- Input validation and sanitization
+- Secure password handling with BCrypt
 
-### Authentication
+## API Documentation
 
-| Method | Endpoint         | Description                                      |
-| ------ | ---------------- | ------------------------------------------------ |
-| POST   | `/api/auth/signup` | Register a new user.                             |
-| POST   | `/api/auth/login`  | Authenticate a user and receive a JWT.           |
-| POST   | `/api/auth/logout` | Log out the current user and invalidate their token. |
+### Authentication Endpoints
+```
+POST   /api/auth/signup     - User registration
+POST   /api/auth/login      - User authentication
+POST   /api/auth/logout     - Token invalidation
+```
 
-### Topics
+### Content Management
+```
+GET    /api/topics          - List topics (paginated)
+POST   /api/topics          - Create topic (authenticated)
+GET    /api/topics/{id}     - Get topic details
+GET    /api/topics/{id}/posts - Get topic posts
 
-| Method | Endpoint               | Description                                         |
-| ------ | ---------------------- | --------------------------------------------------- |
-| POST   | `/api/topics`          | Create a new topic. (Authentication required)       |
-| GET    | `/api/topics`          | Get a paginated list of all topics.                 |
-| GET    | `/api/topics/{id}`     | Get a specific topic by its ID.                     |
-| GET    | `/api/topics/{id}/posts` | Get a paginated list of posts for a specific topic. |
+GET    /api/posts           - List posts (paginated)
+POST   /api/posts           - Create post (authenticated)
+GET    /api/posts/{id}      - Get post with comments
+POST   /api/posts/{id}/like - Like/unlike post
 
-### Posts
+POST   /api/comments        - Create comment (authenticated)
+GET    /api/comments/post/{postId} - Get post comments
+```
 
-| Method | Endpoint               | Description                                                   |
-| ------ | ---------------------- | ------------------------------------------------------------- |
-| POST   | `/api/posts`           | Create a new post. (Authentication required)                  |
-| GET    | `/api/posts`           | Get a paginated list of all posts.                            |
-| GET    | `/api/posts/{id}`      | Get a specific post by its ID, including its comments.        |
-| POST   | `/api/posts/{id}/like` | Like a post. (Authentication required)                        |
-| DELETE | `/api/posts/{id}/like` | Unlike a post. (Authentication required)                      |
+### Administration
+```
+GET    /api/admin/users     - User management (admin only)
+GET    /api/admin/posts     - Content overview (moderator+)
+POST   /api/admin/users/{id}/ban - User moderation
+DELETE /api/admin/posts/{id} - Content removal
+```
 
-### Comments
+## Development Setup
 
-| Method | Endpoint                   | Description                                       |
-| ------ | -------------------------- | ------------------------------------------------- |
-| POST   | `/api/comments`            | Create a new comment on a post. (Authentication required) |
-| GET    | `/api/comments/post/{postId}` | Get all comments for a specific post.             |
-| GET    | `/api/comments/{commentId}/replies` | Get all replies for a specific comment.           |
+### Prerequisites
+- Java 17+
+- Node.js 16+
+- PostgreSQL 13+
+- Maven 3.6+
 
-### Users
+### Backend Configuration
 
-| Method | Endpoint           | Description                                       |
-| ------ | ------------------ | ------------------------------------------------- |
-| GET    | `/api/users/current` | Get the currently authenticated user's profile.     |
+1. **Database Setup**
+   ```bash
+   docker run --name minutegram-postgres \
+     -e POSTGRES_DB=minutegram_db \
+     -e POSTGRES_USER=${DB_USERNAME} \
+     -e POSTGRES_PASSWORD=${DB_PASSWORD} \
+     -p 5432:5432 -d postgres:13
+   ```
 
-### Admin & Moderation
+2. **Environment Variables**
+   
+   Create a `.env` file in the root directory (copy from `.env.example`):
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Configure the following variables in your `.env` file:
+   ```bash
+   # Database Configuration
+   DB_URL=jdbc:postgresql://localhost:5432/minutegram_db
+   DB_USERNAME=your_db_username
+   DB_PASSWORD=your_secure_db_password
+   
+   # JWT Configuration
+   JWT_SECRET=your_256_bit_secret_key_here
+   JWT_EXPIRATION=86400000
+   
+   # Cloudinary Configuration
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUDINARY_API_KEY=your_cloudinary_api_key
+   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   
+   # Server Configuration
+   SERVER_PORT=8080
+   ```
 
-| Method | Endpoint                         | Description                                                              |
-| ------ | -------------------------------- | ------------------------------------------------------------------------ |
-| GET    | `/api/admin/posts`               | Get a paginated list of all posts. (Admin/Moderator only)                |
-| GET    | `/api/admin/comments`            | Get a paginated list of all comments. (Admin/Moderator only)             |
-| GET    | `/api/admin/users`               | Get a paginated list of all users. (Admin only)                          |
-| GET    | `/api/admin/topics`              | Get a paginated list of all topics. (Admin/Moderator only)               |
-| POST   | `/api/admin/users/{userId}/ban`  | Ban a user. (Admin/Moderator only)                                       |
-| POST   | `/api/admin/users/{userId}/unban`| Unban a user. (Admin/Moderator only)                                     |
-| POST   | `/api/admin/users/{userId}/role` | Update a user's role. (Admin only)                                       |
-| DELETE | `/api/admin/posts/{postId}`      | Delete a post. (Admin/Moderator only)                                    |
-| DELETE | `/api/admin/comments/{commentId}`| Delete a comment. (Admin/Moderator only)                                 |
-| DELETE | `/api/admin/topics/{topicId}`    | Delete a topic. (Admin/Moderator only)                                   |
+3. **Run Backend**
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-## Local Development
+### Frontend Configuration
 
-1.  **Clone the repository:**
+1. **Install Dependencies**
+   ```bash
+   cd client
+   npm install
+   ```
 
-    ```bash
-    git clone https://github.com/your-username/MinuteGram.git
-    cd MinuteGram
-    ```
+2. **Environment Setup**
+   ```bash
+   echo "VITE_API_BASE_URL=http://localhost:8080" > .env.local
+   ```
 
-2.  **Backend Setup:**
+3. **Run Frontend**
+   ```bash
+   npm run dev
+   ```
 
-    *   Navigate to the root directory.
-    *   Create a `.env` file by copying the `.env.example` and fill in the required environment variables.
-    *   Start the PostgreSQL database using Docker:
+### Docker Deployment
 
-        ```bash
-        docker run --name minutegram-postgres -e POSTGRES_DB=minutegram_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:13
-        ```
+```bash
+# Start all services
+docker-compose up -d
 
-    *   Run the Spring Boot application:
+# View logs
+docker-compose logs -f
 
-        ```bash
-        ./mvnw spring-boot:run
-        ```
+# Stop services
+docker-compose down
+```
 
-3.  **Frontend Setup:**
+## Testing
 
-    *   Navigate to the `client` directory:
+### Backend Tests
+```bash
+# Run all tests
+./mvnw test
 
-        ```bash
-        cd client
-        ```
+# Run specific test suites
+./mvnw test -Dtest="*ServiceTest"
+./mvnw test -Dtest="*RepositoryTest"
 
-    *   Install the dependencies:
+# Run with coverage
+./mvnw test jacoco:report
+```
 
-        ```bash
-        npm install
-        ```
+### Frontend Tests
+```bash
+cd client
+npm test
+```
 
-    *   Create a `.env.local` file and add the following environment variable, pointing to your backend's API URL:
+## Project Structure
 
-        ```
-        VITE_API_BASE_URL=http://localhost:8080
-        ```
+```
+├── src/main/java/com/minutegram/
+│   ├── controller/          # REST controllers
+│   ├── service/            # Business logic
+│   ├── repository/         # Data access layer
+│   ├── entity/             # JPA entities
+│   ├── dto/                # Data transfer objects
+│   ├── config/             # Configuration classes
+│   └── exception/          # Custom exceptions
+├── src/test/java/          # Unit and integration tests
+├── client/
+│   ├── src/
+│   │   ├── component/      # React components
+│   │   └── service/        # API services
+│   └── public/             # Static assets
+└── docker-compose.yml      # Container orchestration
+```
 
-    *   Start the development server:
+## Contributing
 
-        ```bash
-        npm run dev
-        ```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit changes (`git commit -am 'Add new feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
