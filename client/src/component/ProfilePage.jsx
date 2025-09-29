@@ -39,7 +39,7 @@ const ProfilePage = () => {
     username: 'amritanshu',
     email: 'amritanshu8@gmail.com',
     joinDate: '2023-06-15',
-    bio: 'kya likhu bc',
+    bio: 'incomplete feature',
     stats: {
       posts: 42,
       comments: 128,
@@ -48,8 +48,8 @@ const ProfilePage = () => {
       following: 51
     },
     recentActivity: [
-      { type: 'post', title: 'Fuck React', date: '2 days ago' },
-      { type: 'comment', title: 'This shit is ass', date: '5 days ago' },
+      { type: 'post', title: 'React', date: '2 days ago' },
+      { type: 'comment', title: 'This is work in progress', date: '5 days ago' },
       { type: 'like', title: 'Awesome Machine Learning Tutorial', date: '1 week ago' }
     ]
   };

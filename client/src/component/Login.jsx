@@ -38,10 +38,8 @@ const Login = () => {
       // 2. THIS IS THE FIX.
       //    We call the one true 'login' function from our AuthContext.
       //    It handles setting the user state AND saving the token to localStorage.
+      //    The AuthContext login function will handle navigation, so we don't need to navigate here.
       login(userData, token);
-
-      // 3. NOW that the application state is correctly updated, we can navigate.
-      navigate('/');
 
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.response?.data || 'Authentication failed. Please check your credentials.';

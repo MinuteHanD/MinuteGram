@@ -4,6 +4,12 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION
