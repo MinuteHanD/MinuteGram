@@ -175,7 +175,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void countByBannedFalse_ShouldReturnCountOfActivUsers() {
+    void countByBannedFalse_ShouldReturnCountOfActiveUsers() {
         // Act
         long count = userRepository.countByBannedFalse();
 
