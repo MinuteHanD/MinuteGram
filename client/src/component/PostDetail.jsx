@@ -31,19 +31,19 @@ const ReplyForm = ({ onReplySubmit, onCancel, isSubmitting }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-700/60">
+    <form onSubmit={handleSubmit} className="bg-base-200/70 rounded-lg p-4 border border-base-300">
       <textarea
         value={replyContent}
         onChange={(e) => setReplyContent(e.target.value)}
         placeholder="Write your reply..."
-        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-3 text-zinc-200 placeholder-zinc-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 resize-none"
+        className="w-full bg-base-100 border border-base-300 rounded-lg p-3 text-base-content placeholder-base-content/40 focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 resize-none"
         rows="3"
       />
       <div className="flex justify-end gap-2 mt-3">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-zinc-400 hover:text-zinc-200 transition-colors duration-200"
+          className="px-4 py-2 text-base-content/70 hover:text-base-content transition-colors duration-200"
         >
           Cancel
         </button>
@@ -227,7 +227,7 @@ const PostDetail = () => {
   // Render skeleton while loading
   if (isLoading) {
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-200 py-12 px-4 max-w-5xl mx-auto">
+        <div className="min-h-screen bg-base-100 text-base-content py-12 px-4 max-w-5xl mx-auto">
             <PostDetailSkeleton />
         </div>
     );
@@ -238,10 +238,10 @@ const PostDetail = () => {
   // Render "Post Not Found" state
   if (!post) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-400 flex items-center justify-center text-center p-8">
+      <div className="min-h-screen bg-base-100 text-base-content/70 flex items-center justify-center text-center p-8">
         <ModernCard className="p-10">
-            <h3 className="text-3xl font-bold text-white mb-4">Post Not Found</h3>
-            <p className="text-zinc-400 mb-6">Oops! This post might have been deleted or moved.</p>
+            <h3 className="text-3xl font-bold text-base-content mb-4">Post Not Found</h3>
+            <p className="text-base-content/70 mb-6">Oops! This post might have been deleted or moved.</p>
             <ModernButton onClick={() => navigate('/')}>
                 <ArrowLeft className="w-5 h-5"/> Back to Home
             </ModernButton>
@@ -276,19 +276,19 @@ const PostDetail = () => {
 
     return (
       <div className={`${isReply ? 'ml-8 border-l-2 border-teal-500/30 pl-4' : ''}`}>
-        <div className="flex items-start gap-4 p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/60 shadow-inner">
+        <div className="flex items-start gap-4 p-4 bg-base-200/70 rounded-xl border border-base-300 shadow-sm">
             <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0">
-                <User className="w-6 h-6 text-teal-400" />
+                <User className="w-6 h-6 text-teal-500" />
             </div>
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-zinc-200 text-base">@{comment.authorName}</span>
-                    <span className="text-xs text-zinc-500">•</span>
-                    <span className="text-xs text-zinc-500">
+                    <span className="font-semibold text-base-content text-base">@{comment.authorName}</span>
+                    <span className="text-xs text-base-content/40">•</span>
+                    <span className="text-xs text-base-content/60">
                         {new Date(comment.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                 </div>
-                <p className="text-zinc-300 leading-relaxed text-sm mt-1">{comment.content}</p>
+                <p className="text-base-content/90 leading-relaxed text-sm mt-1">{comment.content}</p>
                 
                 {/* Reply button - only show for authenticated users and not for replies */}
                 {token && !isReply && (
@@ -327,7 +327,7 @@ const PostDetail = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 font-sans">
+    <div className="min-h-screen bg-base-100 text-base-content font-sans">
         <Notification 
             message={notification.message} 
             type={notification.type} 
@@ -343,7 +343,7 @@ const PostDetail = () => {
             <ModernButton 
                 variant="ghost" 
                 onClick={() => navigate(-1)} 
-                className="mb-6 group text-zinc-400 hover:text-zinc-100 px-4 py-2" // Smaller padding
+                className="mb-6 group text-base-content/70 hover:text-base-content px-4 py-2" // Smaller padding
             >
                 <ArrowLeft className="w-5 h-5 mr-2 transition-transform group-hover:-translate-x-1" />
                 <span>Back to previous page</span>
@@ -351,18 +351,18 @@ const PostDetail = () => {
 
             {/* Post Content Section - Main Card */}
             <ModernCard className="p-6 md:p-10 space-y-8">
-                <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight">
+                <h1 className="text-3xl md:text-5xl font-extrabold text-base-content leading-tight">
                     {post.title}
                 </h1>
                 
                 {/* Author & Date Info - Clear and clean */}
-                <div className="flex items-center gap-4 py-4 border-y border-zinc-700/60">
+                <div className="flex items-center gap-4 py-4 border-y border-base-300">
                     <div className="w-14 h-14 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0 shadow-md">
-                        <User className="w-7 h-7 text-teal-400" />
+                        <User className="w-7 h-7 text-teal-500" />
                     </div>
                     <div>
-                        <p className="font-semibold text-zinc-200 text-lg">@{post.authorName}</p>
-                        <p className="text-sm text-zinc-400 flex items-center gap-2 mt-1">
+                        <p className="font-semibold text-base-content text-lg">@{post.authorName}</p>
+                        <p className="text-sm text-base-content/60 flex items-center gap-2 mt-1">
                             <CalendarDays className="w-4 h-4" />
                             <span>Posted on {new Date(post.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                         </p>
@@ -389,12 +389,12 @@ const PostDetail = () => {
                 )}
 
                 {/* Post Content - Readable with good line height */}
-                <div className="text-zinc-300 leading-relaxed text-lg whitespace-pre-wrap py-4 break-words">
+                <div className="text-base-content/90 leading-relaxed text-lg whitespace-pre-wrap py-4 break-words">
                     {post.content}
                 </div>
                 
                 {/* Interaction Buttons - More spaced out and visually distinct */}
-                <div className="flex flex-wrap items-center justify-between pt-6 border-t border-zinc-700/60 gap-4">
+                <div className="flex flex-wrap items-center justify-between pt-6 border-t border-base-300 gap-4">
                     <div className="flex items-center gap-5">
                         <ModernIconButton
                             icon={ThumbsUp} // Changed icon for a fresh feel
@@ -428,17 +428,17 @@ const PostDetail = () => {
 
             {/* Comments Section - Dedicated card, clean layout */}
             <ModernCard className="p-6 md:p-10">
-                <h2 className="text-3xl font-bold text-white mb-8">
-                    <MessageSquareText className="inline-block w-7 h-7 mr-3 text-teal-400" />
+                <h2 className="text-3xl font-bold text-base-content mb-8">
+                    <MessageSquareText className="inline-block w-7 h-7 mr-3 text-teal-500" />
                     {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
                 </h2>
 
                 {token ? (
                     <CommentForm postId={postId} onCommentAdded={handleAddComment} />
                 ) : (
-                    <div className="text-center bg-zinc-800/50 p-6 rounded-xl border border-zinc-700/60 mb-10">
-                        <p className="text-zinc-400 text-lg">
-                            Wanna join the convo? <Link to="/login" className="text-teal-400 hover:underline">Log in</Link> or <Link to="/signup" className="text-teal-400 hover:underline">sign up</Link> to drop a comment.
+                    <div className="text-center bg-base-200/70 p-6 rounded-xl border border-base-300 mb-10">
+                        <p className="text-base-content/70 text-lg">
+                            Wanna join the convo? <Link to="/login" className="text-teal-500 hover:underline">Log in</Link> or <Link to="/signup" className="text-teal-500 hover:underline">sign up</Link> to drop a comment.
                         </p>
                     </div>
                 )}
@@ -449,8 +449,8 @@ const PostDetail = () => {
                         // Map through comments and render CommentCard for each
                         comments.map(comment => <CommentCard key={comment.id} comment={comment} />)
                     ) : (
-                        <div className="text-center py-8 text-zinc-400 bg-zinc-900/50 rounded-lg border border-zinc-700/60">
-                            <p className="text-xl font-medium">No comments yet.</p>
+                        <div className="text-center py-8 text-base-content/70 bg-base-200/50 rounded-lg border border-base-300">
+                            <p className="text-xl font-medium text-base-content">No comments yet.</p>
                             <p className="text-sm mt-2">Be the first to share your perspective!</p>
                         </div>
                     )}

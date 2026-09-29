@@ -77,7 +77,7 @@ const Home = () => {
       onClick={() => navigate(`/topics/${topic.id}`)}
     >
       <div className="flex justify-between items-start">
-        <h3 className="text-xl font-bold text-primary-content mb-2">{topic.name}</h3>
+        <h3 className="text-xl font-bold text-base-content mb-2">{topic.name}</h3>
         <div className="text-sm text-base-content flex items-center gap-1"><MessageSquare size={14}/> {topic.postCount || 0}</div>
       </div>
       <p className="text-base-content/70 line-clamp-2 mb-4">{topic.description || 'No description provided.'}</p>
@@ -110,7 +110,7 @@ const Home = () => {
     <div className="animate-fade-in">
       {/* Hero Section */}
       <div className="text-center py-20 sm:py-32">
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-primary-content tracking-tight">
+        <h1 className="text-4xl sm:text-6xl font-extrabold text-base-content tracking-tight">
           Welcome to <span className="text-primary">MinuteGram</span>
         </h1>
         <p className="mt-4 max-w-2xl mx-auto text-lg text-base-content/70">
@@ -130,7 +130,7 @@ const Home = () => {
 
       {/* Recent Posts */}
       <div className="mb-16">
-        <h2 className="text-3xl font-bold text-primary-content mb-6">Recent Posts</h2>
+        <h2 className="text-3xl font-bold text-base-content mb-6">Recent Posts</h2>
         {postsLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => <SkeletonCard key={i} />)}
@@ -145,7 +145,7 @@ const Home = () => {
       {/* Topics Section */}
       <div id="topics-section">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h2 className="text-3xl font-bold text-primary-content">Topics</h2>
+          <h2 className="text-3xl font-bold text-base-content">Topics</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50"/>
@@ -174,7 +174,7 @@ const Home = () => {
           </div>
         ) : (
           <div className="text-center py-16 bg-base-200 rounded-lg">
-            <h3 className="text-xl font-semibold text-primary-content">No topics found</h3>
+            <h3 className="text-xl font-semibold text-base-content">No topics found</h3>
             <p className="text-base-content/70 mt-2">Try adjusting your search or create a new topic!</p>
           </div>
         )}
@@ -184,7 +184,7 @@ const Home = () => {
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
           <ModernCard className="w-full max-w-lg p-8">
-            <h2 className="text-2xl font-bold text-primary-content mb-4">Create a New Topic</h2>
+            <h2 className="text-2xl font-bold text-base-content mb-4">Create a New Topic</h2>
             <div className="space-y-4">
               <ModernInput 
                 label="Topic Name"

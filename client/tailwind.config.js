@@ -12,22 +12,22 @@ export default {
         'primary-focus': '#059669', // Emerald 600
         'primary-content': '#ffffff',
 
-        'secondary': '#374151', // Gray 700
-        'secondary-focus': '#1f2937', // Gray 800
-        'secondary-content': '#ffffff',
+        'secondary': 'rgb(var(--secondary) / <alpha-value>)',
+        'secondary-focus': 'rgb(var(--secondary-focus) / <alpha-value>)',
+        'secondary-content': 'rgb(var(--secondary-content) / <alpha-value>)',
 
         'accent': '#38bdf8', // Light Blue 400
         'accent-focus': '#0ea5e9', // Sky 500
         'accent-content': '#ffffff',
 
-        'neutral': '#1f2937', // Gray 800
-        'neutral-focus': '#111827', // Gray 900
-        'neutral-content': '#ffffff',
+        'neutral': 'rgb(var(--neutral) / <alpha-value>)',
+        'neutral-focus': 'rgb(var(--neutral-focus) / <alpha-value>)',
+        'neutral-content': 'rgb(var(--neutral-content) / <alpha-value>)',
 
-        'base-100': '#0d1117', // A dark, slightly blue-ish black
-        'base-200': '#161b22', // A slightly lighter dark shade
-        'base-300': '#21262d', // An even lighter shade for borders
-        'base-content': '#c9d1d9', // Light gray for text
+        'base-100': 'rgb(var(--base-100) / <alpha-value>)',
+        'base-200': 'rgb(var(--base-200) / <alpha-value>)',
+        'base-300': 'rgb(var(--base-300) / <alpha-value>)',
+        'base-content': 'rgb(var(--base-content) / <alpha-value>)',
 
         'info': '#3abff8',
         'success': '#36d399',

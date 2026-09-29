@@ -6,13 +6,34 @@
 
 @layer base {
   :root {
+    color-scheme: light;
+    --base-100: 242 247 244;
+    --base-200: 255 255 255;
+    --base-300: 222 232 226;
+    --base-content: 17 24 21;
+    --secondary: 232 241 236;
+    --secondary-focus: 216 230 222;
+    --secondary-content: 17 24 21;
+    --neutral: 237 244 240;
+    --neutral-focus: 220 232 225;
+    --neutral-content: 17 24 21;
+  }
+
+  html.dark {
     color-scheme: dark;
+    --base-100: 13 17 23;
+    --base-200: 22 27 34;
+    --base-300: 33 38 45;
+    --base-content: 243 244 246;
+    --secondary: 55 65 81;
+    --secondary-focus: 31 41 55;
+    --secondary-content: 255 255 255;
+    --neutral: 31 41 55;
+    --neutral-focus: 17 24 39;
+    --neutral-content: 255 255 255;
   }
 
   body {
     @apply bg-base-100 text-base-content font-sans antialiased;
   }
 }
-
-
-

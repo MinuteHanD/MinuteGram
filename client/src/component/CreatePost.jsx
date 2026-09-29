@@ -36,41 +36,41 @@ const CreatePost = () => {
   
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 p-6">
-      <div className="max-w-3xl mx-auto bg-dark-100/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-dark-300/10">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 to-base-200 p-6">
+      <div className="max-w-3xl mx-auto bg-base-200/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-base-300/10">
         <h2 className="text-3xl font-bold mb-6">Create New Post</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-dark-400 mb-2">Title</label>
+            <label className="block text-base-content mb-2">Title</label>
             <input 
               type="text" 
               value={title} 
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-dark-100/50 text-dark-400 px-4 py-2 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300"
+              className="w-full bg-base-100/50 text-base-content px-4 py-2 rounded-xl border border-base-300/30 focus:ring-2 focus:ring-primary transition-all duration-300"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-dark-400 mb-2">Content</label>
+            <label className="block text-base-content mb-2">Content</label>
             <textarea 
               value={content} 
               onChange={(e) => setContent(e.target.value)}
-              className="w-full bg-dark-100/50 text-dark-400 px-4 py-2 rounded-xl border border-dark-300/30 focus:ring-2 focus:ring-dark-300 transition-all duration-300 h-32 resize-none"
+              className="w-full bg-base-100/50 text-base-content px-4 py-2 rounded-xl border border-base-300/30 focus:ring-2 focus:ring-primary transition-all duration-300 h-32 resize-none"
               required
             ></textarea>
           </div>
           <div className="mb-4">
-            <label className="block text-dark-400 mb-2">Image (optional)</label>
+            <label className="block text-base-content mb-2">Image (optional)</label>
             <input 
               type="file" 
               accept="image/*" 
               onChange={handleFileChange}
-              className="w-full text-dark-400"
+              className="w-full text-base-content"
             />
           </div>
           <button 
             type="submit" 
-            className="bg-dark-300 text-dark-50 px-6 py-3 rounded-xl hover:bg-dark-400 transition-all duration-300 shadow-lg"
+            className="bg-primary text-primary-content px-6 py-3 rounded-xl hover:bg-primary-focus transition-all duration-300 shadow-lg"
           >
             Create Post
           </button>

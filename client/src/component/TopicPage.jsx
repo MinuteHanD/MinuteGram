@@ -56,20 +56,20 @@ const TopicPostCard = React.memo(({ post, onInteraction }) => {
 
             {/* Post Details */}
             <div className="flex-1 flex flex-col">
-                <h3 className="text-lg font-bold text-zinc-100 mb-2 line-clamp-2 leading-snug break-words">
+                <h3 className="text-lg font-bold text-base-content mb-2 line-clamp-2 leading-snug break-words">
                   {post.title || 'Untitled Post'}
                 </h3>
-                <p className="text-zinc-400 text-sm mb-3 line-clamp-3">
+                <p className="text-base-content/70 text-sm mb-3 line-clamp-3">
                     {post.content.slice(0, contentPreviewLength)}{hasLongContent ? '...' : ''}
                 </p>
 
                 {/* Author and Date */}
-                <div className="flex items-center gap-3 text-xs text-zinc-500 mb-4 mt-auto">
+                <div className="flex items-center gap-3 text-xs text-base-content/60 mb-4 mt-auto">
                     <div className="flex items-center gap-1">
                         <User className="w-3 h-3" />
-                        <span className="font-medium text-teal-400">@{post.authorName}</span>
+                        <span className="font-medium text-teal-500">@{post.authorName}</span>
                     </div>
-                    <span className="text-zinc-600">•</span>
+                    <span className="text-base-content/40">•</span>
                     <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         <span>{new Date(post.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -77,7 +77,7 @@ const TopicPostCard = React.memo(({ post, onInteraction }) => {
                 </div>
 
                 {/* Interaction Buttons - smaller and more compact */}
-                <div className="flex items-center justify-between pt-3 border-t border-zinc-700/50">
+                <div className="flex items-center justify-between pt-3 border-t border-base-300">
                     <div className="flex items-center gap-3">
                         <ModernIconButton
                             icon={Heart}
@@ -247,7 +247,7 @@ export const TopicPage = () => {
     ];
     
     return (
-        <div className="relative min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 font-sans">
+        <div className="relative min-h-screen bg-base-100 text-base-content font-sans">
             <Notification 
                 message={notification.message} 
                 type={notification.type} 
@@ -262,7 +262,7 @@ export const TopicPage = () => {
             <main className="relative pt-24 pb-12">
                 <div className="max-w-7xl mx-auto px-6 space-y-12">
                     {/* Topic Header - now more of a distinct, almost "magazine" style banner */}
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900/90 to-zinc-800/80 border border-zinc-700/60 shadow-2xl">
+                    <div className="relative overflow-hidden rounded-2xl bg-base-200/90 border border-base-300 shadow-xl">
                         {/* Subtle background overlay */}
                         <div className="absolute inset-0 bg-gradient-to-r from-teal-600/10 to-emerald-600/10 opacity-70"></div>
                         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
@@ -270,20 +270,20 @@ export const TopicPage = () => {
                         <div className="relative p-8 lg:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="flex items-center gap-5">
                                 <div className="p-4 rounded-xl bg-teal-500/15 flex-shrink-0 shadow-md">
-                                    <FileText className="w-9 h-9 text-teal-400" />
+                                    <FileText className="w-9 h-9 text-teal-500" />
                                 </div>
                                 <div>
                                     {isLoading ? (
                                         <>
-                                            <div className="h-10 w-64 bg-zinc-700 rounded-lg animate-pulse" />
-                                            <div className="h-6 w-48 bg-zinc-700 rounded-md mt-3 animate-pulse" />
+                                            <div className="h-10 w-64 bg-base-300 rounded-lg animate-pulse" />
+                                            <div className="h-6 w-48 bg-base-300 rounded-md mt-3 animate-pulse" />
                                         </>
                                     ) : (
                                         <>
-                                            <h1 className="text-4xl font-extrabold text-white leading-tight">
+                                            <h1 className="text-4xl font-extrabold text-base-content leading-tight">
                                                 {topic?.name}
                                             </h1>
-                                            <p className="text-zinc-400 mt-2 text-lg max-w-lg">
+                                            <p className="text-base-content/70 mt-2 text-lg max-w-lg">
                                                 {topic?.description}
                                             </p>
                                         </>
@@ -309,16 +309,16 @@ export const TopicPage = () => {
                         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
                             <div className="relative w-full max-w-3xl">
                                 <div className="absolute inset-0 bg-gradient-to-r from-teal-600/20 to-cyan-600/20 rounded-3xl blur-xl"></div>
-                                <div className="relative bg-zinc-900/95 backdrop-blur-xl rounded-3xl border border-zinc-700/50 shadow-2xl">
+                                <div className="relative bg-base-200/95 backdrop-blur-xl rounded-3xl border border-base-300 shadow-2xl">
                                     <div className="p-8">
                                         <div className="flex justify-between items-center mb-8">
                                             <div>
-                                                <h2 className="text-2xl font-bold text-white mb-2">Create New Post in "{topic?.name}"</h2>
-                                                <p className="text-zinc-400">Share your thoughts, media, or questions with the community.</p>
+                                                <h2 className="text-2xl font-bold text-base-content mb-2">Create New Post in "{topic?.name}"</h2>
+                                                <p className="text-base-content/70">Share your thoughts, media, or questions with the community.</p>
                                             </div>
                                             <button 
                                                 onClick={() => setShowForm(false)} 
-                                                className="text-zinc-400 hover:text-white transition-colors rounded-full p-2 hover:bg-zinc-800/50"
+                                                className="text-base-content/60 hover:text-base-content transition-colors rounded-full p-2 hover:bg-base-300/50"
                                             >
                                                 <X className="w-6 h-6" />
                                             </button>
@@ -361,7 +361,7 @@ export const TopicPage = () => {
                                                     Upload Media
                                                 </ModernButton>
                                                 {mediaFile && (
-                                                    <div className="flex items-center gap-2 text-zinc-300 text-sm bg-zinc-800/50 px-3 py-2 rounded-lg border border-zinc-700/60 w-full sm:w-auto overflow-hidden text-ellipsis whitespace-nowrap">
+                                                    <div className="flex items-center gap-2 text-base-content text-sm bg-base-100 px-3 py-2 rounded-lg border border-base-300 w-full sm:w-auto overflow-hidden text-ellipsis whitespace-nowrap">
                                                         <span className="truncate">{mediaFile.name}</span>
                                                         <ModernIconButton 
                                                             icon={X} 
@@ -372,7 +372,7 @@ export const TopicPage = () => {
                                                                 setMediaPreview(null);
                                                                 if (fileInputRef.current) fileInputRef.current.value = '';
                                                             }} 
-                                                            className="text-zinc-500 hover:text-zinc-100 hover:bg-zinc-700/60 !p-1"
+                                                            className="text-base-content/60 hover:text-base-content hover:bg-base-300/60 !p-1"
                                                         />
                                                     </div>
                                                 )}
@@ -421,8 +421,8 @@ export const TopicPage = () => {
                     )}
 
                     {/* Filter and Sort options - a dedicated section now */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/60 shadow-inner">
-                        <span className="text-zinc-400 text-base font-semibold mr-2">Browse Posts:</span>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-4 bg-base-200/70 rounded-xl border border-base-300 shadow-sm">
+                        <span className="text-base-content/80 text-base font-semibold mr-2">Browse Posts:</span>
                         <div className="flex gap-3 flex-wrap justify-center sm:justify-start">
                             {filterButtons.map(button => (
                                 <ModernButton
@@ -430,7 +430,7 @@ export const TopicPage = () => {
                                     variant={sortBy === button.id ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setSortBy(button.id)}
-                                    className={sortBy !== button.id ? 'hover:text-teal-300 hover:border-teal-400' : ''}
+                                    className={sortBy !== button.id ? 'hover:text-teal-400 hover:border-teal-400' : ''}
                                 >
                                     <button.icon className="w-4 h-4" />
                                     {button.label}
@@ -447,8 +447,8 @@ export const TopicPage = () => {
                     ) : error ? (
                         <ModernCard className="py-20 text-center flex flex-col items-center justify-center">
                             <XCircle className="w-16 h-16 text-red-500 mb-4" />
-                            <h3 className="text-2xl font-bold text-white mb-2">Error</h3>
-                            <p className="text-zinc-400">{error}</p>
+                            <h3 className="text-2xl font-bold text-base-content mb-2">Error</h3>
+                            <p className="text-base-content/70">{error}</p>
                         </ModernCard>
                     ) : posts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -457,8 +457,8 @@ export const TopicPage = () => {
                     ) : (
                         <ModernCard className="py-20 text-center flex flex-col items-center justify-center">
                             <img src="https://assets-global.website-files.com/5f69ac96ef2c5608ed1165cd/601d51f28b4c2b9a7b7a1e0b_EmptyState.svg" alt="No posts" className="w-48 h-48 mb-6 opacity-80"/>
-                            <h3 className="text-3xl font-bold text-zinc-100 mb-3">No posts yet!</h3>
-                            <p className="text-zinc-400 text-lg max-w-md">Be the first to share something amazing in this topic.</p>
+                            <h3 className="text-3xl font-bold text-base-content mb-3">No posts yet!</h3>
+                            <p className="text-base-content/70 text-lg max-w-md">Be the first to share something amazing in this topic.</p>
                             {token && (
                                 <ModernButton onClick={() => setShowForm(true)} className="mt-8 group">
                                     <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"/> Start a New Post
