@@ -22,16 +22,16 @@ const CommentForm = ({ postId, onCommentAdded }) => {
   };
 
   return (
-    <form onSubmit={handleAddComment} className="flex items-start gap-4 mb-10 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/60 shadow-inner">
+    <form onSubmit={handleAddComment} className="flex items-start gap-4 mb-10 p-4 bg-base-200/70 rounded-xl border border-base-300 shadow-sm">
       <div className="w-12 h-12 rounded-full bg-teal-500/20 flex-shrink-0 flex items-center justify-center">
-        <User className="w-6 h-6 text-teal-400" />
+        <User className="w-6 h-6 text-teal-500" />
       </div>
       <div className="flex-1">
         <ModernTextarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="What are your thoughts on this post?"
-          className="mb-3 bg-zinc-800 border-zinc-700 focus:border-teal-500 focus:ring-teal-500/50"
+          className="mb-3 bg-base-100 border-base-300 text-base-content placeholder-base-content/40 focus:border-teal-500 focus:ring-teal-500/50"
           rows="3"
         />
         <div className="flex justify-end mt-2">

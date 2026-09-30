@@ -21,7 +21,7 @@ export const ModernCard = React.memo(({ children, className = '', ...props }) =>
   }) => {
     const baseStyles = 'rounded-md font-semibold transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
     const variants = {
-      primary: 'bg-primary hover:bg-primary-focus text-primary-content',
+      primary: 'bg-primary hover:bg-primary-focus text-white',
       secondary: 'bg-secondary hover:bg-secondary-focus text-secondary-content',
       ghost: 'hover:bg-base-300 text-base-content',
       danger: 'bg-error hover:bg-error/80 text-white',
@@ -48,11 +48,11 @@ export const ModernCard = React.memo(({ children, className = '', ...props }) =>
   
   export const ModernIconButton = React.memo(({ icon: Icon, label, active = false, onClick, className = '', ...props }) => (
     <button
-      className={`p-2 rounded-md group ${active ? 'bg-primary text-primary-content' : 'hover:bg-base-300 text-base-content'} transition-all flex items-center justify-center gap-2`}
+      className={`p-2 rounded-md group ${active ? 'bg-primary text-white' : 'hover:bg-base-300 text-base-content'} transition-all flex items-center justify-center gap-2`}
       onClick={onClick}
       {...props}
     >
-      <Icon className={`w-5 h-5 ${active ? 'text-primary-content' : 'text-base-content group-hover:text-primary-content'}`} />
+      <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-base-content group-hover:text-primary'}`} />
       {label && <span className="text-sm font-medium">{label}</span>}
     </button>
   ));

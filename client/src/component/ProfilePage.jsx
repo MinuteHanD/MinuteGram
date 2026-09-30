@@ -56,17 +56,17 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 flex items-center justify-center">
-        <div className="animate-pulse text-dark-400">Loading profile...</div>
+      <div className="min-h-screen bg-gradient-to-br from-base-100 to-base-200 flex items-center justify-center">
+        <div className="animate-pulse text-base-content">Loading profile...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-100 to-dark-200 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 to-base-200 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-dark-200/50 backdrop-blur border-dark-300/10 rounded-2xl shadow-xl p-6 mb-6">
+        <div className="bg-base-200/50 backdrop-blur border border-base-300/10 rounded-2xl shadow-xl p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               {/* Profile Avatar */}
@@ -79,7 +79,7 @@ const ProfilePage = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent">
                   {profile?.username || mockProfileData.username}
                 </h1>
-                <div className="flex items-center space-x-3 text-dark-400 mt-2">
+                <div className="flex items-center space-x-3 text-base-content mt-2">
                   <div className="flex items-center space-x-1">
                     <Mail size={16} />
                     <span>{profile?.email || mockProfileData.email}</span>
@@ -95,7 +95,7 @@ const ProfilePage = () => {
             {/* Edit Profile Button */}
             <button 
               onClick={() => setEditMode(!editMode)}
-              className="flex items-center space-x-2 bg-dark-300/10 text-dark-400 px-4 py-2 rounded-lg hover:bg-dark-300/20 transition"
+              className="flex items-center space-x-2 bg-base-300/10 text-base-content px-4 py-2 rounded-lg hover:bg-base-300/20 transition"
             >
               <Edit2 size={16} />
               <span>{editMode ? 'Cancel' : 'Edit Profile'}</span>
@@ -107,7 +107,7 @@ const ProfilePage = () => {
             <h3 className="text-xl font-semibold mb-2 flex items-center">
               <Award size={20} className="mr-2 text-red-500" /> About Me
             </h3>
-            <p className="text-dark-400">
+            <p className="text-base-content">
               {profile?.bio || mockProfileData.bio}
             </p>
           </div>
@@ -116,7 +116,7 @@ const ProfilePage = () => {
         {/* Profile Statistics */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Stats Card */}
-          <div className="bg-dark-200/50 backdrop-blur border-dark-300/10 rounded-2xl shadow-xl p-6">
+          <div className="bg-base-200/50 backdrop-blur border border-base-300/10 rounded-2xl shadow-xl p-6">
             <h3 className="text-xl font-semibold mb-4 flex items-center">
               <User size={20} className="mr-2 text-blue-500" /> Profile Statistics
             </h3>
@@ -130,17 +130,17 @@ const ProfilePage = () => {
               ].map(({ icon: Icon, label, value }) => (
                 <div key={label} className="text-center">
                   <div className="flex justify-center mb-2">
-                    <Icon size={20} className="text-dark-400" />
+                    <Icon size={20} className="text-base-content" />
                   </div>
                   <div className="font-bold text-lg">{value}</div>
-                  <div className="text-dark-400 text-sm">{label}</div>
+                  <div className="text-base-content text-sm">{label}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-dark-200/50 backdrop-blur border-dark-300/10 rounded-2xl shadow-xl p-6">
+          <div className="bg-base-200/50 backdrop-blur border border-base-300/10 rounded-2xl shadow-xl p-6">
             <h3 className="text-xl font-semibold mb-4 flex items-center">
               <Settings size={20} className="mr-2 text-green-500" /> Recent Activity
             </h3>
@@ -148,13 +148,13 @@ const ProfilePage = () => {
               {mockProfileData.recentActivity.map((activity, index) => (
                 <div 
                   key={index} 
-                  className="bg-dark-300/10 rounded-lg p-3 hover:bg-dark-300/20 transition"
+                  className="bg-base-300/10 rounded-lg p-3 hover:bg-base-300/20 transition"
                 >
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="font-medium capitalize">{activity.type}</span>: {activity.title}
                     </div>
-                    <span className="text-dark-400 text-sm">{activity.date}</span>
+                    <span className="text-base-content text-sm">{activity.date}</span>
                   </div>
                 </div>
               ))}

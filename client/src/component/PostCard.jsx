@@ -11,7 +11,7 @@ const PostCard = ({ post }) => {
       className="p-6 group cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-2xl hover:shadow-primary/20"
       onClick={() => navigate(`/posts/${post.id}`)}
     >
-      <h3 className="text-xl font-bold text-primary-content mb-2 truncate">{post.title}</h3>
+      <h3 className="text-xl font-bold text-base-content mb-2 truncate">{post.title}</h3>
       
       {/* Media Display */}
       {post.imageUrl && (
